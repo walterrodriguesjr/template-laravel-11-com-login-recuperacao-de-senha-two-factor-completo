@@ -32,18 +32,32 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-    {
-        $credentials = $request->only('email', 'password');
+{
+    // Validação básica
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-        if (!Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
-        }
-
-        $user = Auth::user();
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json(['message' => 'Login successful', 'access_token' => $token, 'token_type' => 'Bearer']);
+    // Verifica se o e-mail existe
+    $user = User::where('email', $request->email)->first();
+    if (!$user) {
+        return back()->withErrors(['email' => 'E-mail não cadastrado.'])->withInput();
     }
+
+    // Verifica credenciais
+    if (!Auth::attempt($request->only('email', 'password'))) {
+        return back()->withErrors(['password' => 'Senha incorreta.'])->withInput();
+    }
+
+    // Login bem-sucedido
+    $user = Auth::user();
+    $token = $user->createToken('auth_token')->plainTextToken;
+
+    // Redireciona para o dashboard ou outra página
+    return redirect()->route('dashboard')->with('access_token', $token);
+}
+
 
     public function logout(Request $request)
     {
