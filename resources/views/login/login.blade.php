@@ -16,6 +16,15 @@
                         <small class="text-white-50">Acesse sua conta</small>
                     </div>
                     <div class="card-body">
+
+                        @if ($errors->has('throttle'))
+                            <div class="alert alert-danger" role="alert">
+                                <i class="fas fa-exclamation-circle"></i> {{ $errors->first('throttle') }}
+                            </div>
+                        @endif
+                        
+
+                        <!-- Formulário de Login -->
                         <form action="{{ route('login') }}" method="POST">
                             @csrf
                             <!-- Email -->

@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Auth\Events\Lockout;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Support\Facades\RateLimiter;
+
 
 class AuthController extends Controller
 {
@@ -31,37 +35,49 @@ class AuthController extends Controller
         return response()->json(['message' => 'User registered successfully', 'user' => $user], 201);
     }
 
+   
     public function login(Request $request)
+    {
+        try {
+            // Validação básica
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required',
+            ]);
+    
+            // Verifica se o e-mail existe
+            $user = User::where('email', $request->email)->first();
+            if (!$user) {
+                return back()->withErrors(['email' => 'E-mail não cadastrado.'])->withInput();
+            }
+    
+            // Verifica credenciais
+            if (!Auth::attempt($request->only('email', 'password'))) {
+                return back()->withErrors(['password' => 'Senha incorreta.'])->withInput();
+            }
+    
+            // Login bem-sucedido
+            $user = Auth::user();
+            $token = $user->createToken('auth_token')->plainTextToken;
+    
+            // Redireciona para a rota "main"
+            return redirect()->route('main')->with('success', 'Bem-vindo, ' . $user->name);
+        } catch (ThrottleRequestsException $e) {
+            // Redireciona com mensagem amigável
+            return back()->withErrors(['throttle' => 'Muitas tentativas de login. Tente novamente em 1 minuto.'])->withInput();
+        }
+    }
+    
+
+
+
+public function logout(Request $request)
 {
-    // Validação básica
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
+    Auth::logout(); // Realiza logout da sessão
+    $request->session()->invalidate(); // Invalida a sessão atual
+    $request->session()->regenerateToken(); // Gera um novo token CSRF
 
-    // Verifica se o e-mail existe
-    $user = User::where('email', $request->email)->first();
-    if (!$user) {
-        return back()->withErrors(['email' => 'E-mail não cadastrado.'])->withInput();
-    }
-
-    // Verifica credenciais
-    if (!Auth::attempt($request->only('email', 'password'))) {
-        return back()->withErrors(['password' => 'Senha incorreta.'])->withInput();
-    }
-
-    // Login bem-sucedido
-    $user = Auth::user();
-    $token = $user->createToken('auth_token')->plainTextToken;
-
-    // Redireciona para o dashboard ou outra página
-    return redirect()->route('dashboard')->with('access_token', $token);
+    return redirect()->route('login')->with('success', 'Você foi desconectado com sucesso.');
 }
 
-
-    public function logout(Request $request)
-    {
-        $request->user()->currentAccessToken()->delete();
-        return response()->json(['message' => 'Logged out successfully']);
-    }
 }
