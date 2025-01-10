@@ -7,60 +7,88 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+# Template Laravel 11 - Login, Recuperação de Senha e Autenticação em Dois Fatores
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Este é um **template completo** para projetos Laravel 11, incluindo:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Autenticação de usuários (Login e Logout).
+- Recuperação de senha por e-mail.
+- Autenticação em dois fatores (2FA) com suporte a códigos enviados por e-mail.
+- Configuração pronta para uso com Docker e Laravel Sail.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Sobre o Projeto
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Este template foi desenvolvido por **Walter Rodrigues Jr.** para acelerar o desenvolvimento de novos projetos Laravel com práticas modernas e recursos essenciais de autenticação e segurança.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+O projeto é configurado para funcionar imediatamente com Docker, facilitando o setup do ambiente de desenvolvimento.
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Pré-requisitos
 
-### Premium Partners
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+---
 
-## Contributing
+## Como Usar
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Passo 1: Clone o Repositório
 
-## Code of Conduct
+```bash
+git clone https://github.com/walterrodriguesjr/template-laravel-11-com-login-recuperacao-de-senha-two-factor-completo.git
+cd template-laravel-11-com-login-recuperacao-de-senha-two-factor-completo
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Passo 2: Configuração Inicial
+    1.Copie o arquivo .env.example para .env:
 
-## Security Vulnerabilities
+        cp .env.example .env
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+    2.Gere a chave da aplicação:
 
-## License
+        docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/html laravelsail/php82-composer:latest php artisan key:generate
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Passo 3: Subir os Containers
+    1.Construa e inicie os containers:
+
+        docker-compose up -d --build
+
+Passo 4: Instalar Dependências
+    1.Dependências PHP:
+
+        docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/html laravelsail/php82-composer:latest composer install
+
+    2.Dependências JavaScript:
+
+        docker exec -it laravel_app bash
+        npm install && npm run dev
+
+Passo 5: Executar Migrations
+        docker exec -it laravel_app bash
+        php artisan migrate
+
+Passo 6: Acessar o Projeto
+    1.Acesse no navegador: 
+
+        http://localhost
+
+Funcionalidades
+Login e Logout: Implementado com autenticação básica.
+Recuperação de Senha: Envio de link de redefinição por e-mail.
+Autenticação em Dois Fatores (2FA): Geração e verificação de códigos enviados por e-mail.
+Configuração com Docker e Laravel Sail.
+Contribuição
+Contribuições são bem-vindas! Abra uma Issue ou envie um Pull Request para sugerir melhorias.
+
+Licença
+Este projeto está licenciado sob a MIT License.   
+
+
+
+
+
+
