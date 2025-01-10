@@ -16,8 +16,9 @@ class AdminUserSeeder extends Seeder
         User::create([
             'name' => 'Admin',
             'email' => 'walterrjr.86@gmail.com',
-            'password' => Hash::make('052917052917'),
+            'password' => Hash::make('Pmprparana2025!'),
+            'two_factor_enabled' => true, // Habilita o 2FA
+            'two_factor_type' => 'email', // Define o tipo como e-mail
         ]);
     }
 }
-

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\PasswordController;
+use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\AuthController;
 
 /**
@@ -45,7 +46,8 @@ Route::post('/reset-password', [PasswordController::class, 'resetPassword'])
  */
 Route::get('/main', function () {
     return view('main.main');
-})->middleware('auth')->name('main');
+})->middleware(['auth', 'two-factor.verified'])->name('main');
+
 
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth') // Use 'auth' em vez de 'auth:sanctum'
@@ -57,3 +59,16 @@ Route::post('/logout', [AuthController::class, 'logout'])
  */
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login');
  Route::post('/register', [AuthController::class, 'register'])->name('register');
+
+ Route::get('/two-factor', [TwoFactorController::class, 'showTwoFactorForm'])
+ ->middleware('auth')
+ ->name('two-factor.show');
+
+Route::post('/two-factor', [TwoFactorController::class, 'verifyTwoFactor'])
+ ->middleware('auth')
+ ->name('two-factor.verify');
+
+Route::post('/two-factor/resend', [TwoFactorController::class, 'resendTwoFactorCode'])
+ ->middleware('auth')
+ ->name('two-factor.resend');
+

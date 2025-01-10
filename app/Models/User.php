@@ -6,46 +6,54 @@ use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Sanctum\HasApiTokens;
-
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * Os atributos que podem ser atribuídos em massa.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
+        'two_factor_enabled',
+        'two_factor_type',
+        'two_factor_code',
+        'two_factor_expires_at',
     ];
 
-    /**
-     * Os atributos que devem ser ocultados na serialização.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_code', // Esconde o código de 2FA
     ];
 
-    /**
-     * Os atributos que devem ser convertidos para tipos nativos.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'password' => 'hashed',
+        'two_factor_expires_at' => 'datetime',
     ];
 
     public function sendPasswordResetNotification($token)
-{
-    $this->notify(new ResetPasswordNotification($token));
-}
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
+
+    public function generateTwoFactorCode()
+    {
+        $this->forceFill([
+            'two_factor_code' => random_int(100000, 999999), // Código de 6 dígitos
+            'two_factor_expires_at' => now()->addMinutes(10), // Expiração de 10 minutos
+        ])->save();
+    }
+
+    public function sendTwoFactorCode()
+    {
+        if ($this->two_factor_type === 'email') {
+            Mail::to($this->email)->send(new \App\Mail\TwoFactorCodeMail($this));
+        } elseif ($this->two_factor_type === 'sms') {
+            // Integração com serviço de SMS, como Twilio
+        }
+    }
 }
 

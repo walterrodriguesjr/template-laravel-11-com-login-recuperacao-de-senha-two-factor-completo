@@ -48,6 +48,7 @@
                                     </div>
                                 @enderror
                             </div>
+                            
                             <div class="mb-4">
                                 <label for="password_confirmation" class="form-label">Confirme a Nova Senha</label>
                                 <input 
