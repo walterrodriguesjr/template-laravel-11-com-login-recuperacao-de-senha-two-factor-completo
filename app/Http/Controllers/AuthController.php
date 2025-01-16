@@ -78,16 +78,18 @@ public function login(Request $request)
         return back()->withErrors(['throttle' => 'Muitas tentativas de login. Tente novamente em 1 minuto.'])->withInput();
     }
 }
-
-
-    
+  
 public function logout(Request $request)
 {
+    // Verifica se o usuário está autenticado
+    if (!Auth::check()) {
+        return redirect()->route('login')->with('info', 'Você já está desconectado.');
+    }
+
     Auth::logout(); // Realiza logout da sessão
     $request->session()->invalidate(); // Invalida a sessão atual
     $request->session()->regenerateToken(); // Gera um novo token CSRF
 
     return redirect()->route('login')->with('success', 'Você foi desconectado com sucesso.');
 }
-
 }

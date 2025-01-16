@@ -18,34 +18,33 @@
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
             <ul class="navbar-nav">
+                <!-- Botão para expandir/recolher o sidebar -->
                 <li class="nav-item">
-                    <!-- Botão para expandir/recolher o sidebar -->
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button">
                         <i class="fas fa-bars"></i>
                     </a>
                 </li>
             </ul>
+        
+            <!-- Conteúdo alinhado à direita -->
+            <ul class="navbar-nav ms-auto mr-3">
+                <li class="nav-item d-flex align-items-center">
+                    <span class="me-3">Olá, {{ Auth::user()->name }}</span>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Sair</button>
+                    </form>
+                </li>
+            </ul>
         </nav>
+        
 
         <!-- Sidebar -->
         @include('components.sidebar.sidebar')
 
         <!-- Conteúdo principal -->
         <main class="content-wrapper p-4">
-            <header class="d-flex justify-content-between align-items-center mb-4">
-                <h1>Bem-vindo ao Painel</h1>
-                <div>
-                    <span class="me-3">Olá, {{ Auth::user()->name }}</span>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-outline-danger btn-sm">Sair</button>
-                    </form>
-                </div>
-            </header>
-
-            <div class="content">
-                <p>Selecione uma opção no menu lateral para começar.</p>
-            </div>
+            @yield('content')
         </main>
     </div>
 
@@ -58,5 +57,6 @@
             console.log('AdminLTE Sidebar está funcionando!');
         });
     </script>
+    @stack('scripts')
 </body>
 </html>
