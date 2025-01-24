@@ -2,27 +2,37 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="#" class="brand-link">
-        <img src="https://adminlte.io/themes/v3/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        <img src="https://adminlte.io/themes/v3/dist/img/AdminLTELogo.png" alt="AdminLTE Logo"
+            class="brand-image img-circle elevation-3" style="opacity: .8">
         <span class="brand-text font-weight-light">Gestão Jurídica</span>
     </a>
 
     <!-- Sidebar -->
     <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <a href="{{ route('perfil.index') }}"
+            class="d-flex align-items-center flex-column text-white text-decoration-none user-panel mt-3 pb-3 mb-3">
+            <!-- "Meus Dados" visível apenas no sidebar expandido -->
+            <span class="fw-bold text-sm text-expanded mb-2 ml-2">Perfil</span>
+
+            <!-- Foto do usuário -->
             <div class="image">
-                <img src="https://adminlte.io/themes/v3/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                <img src="https://adminlte.io/themes/v3/dist/img/user2-160x160.jpg" class="img-circle elevation-2"
+                    alt="User Image">
             </div>
+
+            <!-- Nome do usuário -->
             <div class="info">
-                <a href="#" class="d-block">{{ Auth::user()->name }}</a>
+                <span class="d-block">{{ Auth::user()->name }}</span>
             </div>
-        </div>
+        </a>
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                data-accordion="false">
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('main') }}" class="nav-link">
                         <i class="nav-icon fas fa-home"></i>
                         <p>Dashboard</p>
                     </a>

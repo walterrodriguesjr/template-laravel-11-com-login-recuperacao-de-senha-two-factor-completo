@@ -34,6 +34,11 @@ class User extends Authenticatable
         'two_factor_expires_at' => 'datetime',
     ];
 
+    public function userData()
+    {
+        return $this->hasOne(UserData::class);
+    }
+
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPasswordNotification($token));
@@ -56,4 +61,3 @@ class User extends Authenticatable
         }
     }
 }
-

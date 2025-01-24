@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Principal</title>
+
+    <!-- AdminLTE CSS via CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.0.0/dist/css/adminlte.min.css">
+
+    <!-- Font Awesome via CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="{{ asset('vendor/select2/css/select2.min.css') }}">
+
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="{{ asset('vendor/toastr/css/toastr.min.css') }}">
+
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="{{ asset('css/perfil/perfil-form.css') }}">
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed sidebar-collapse">
+    <div class="wrapper">
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <ul class="navbar-nav">
+                <!-- Botão para expandir/recolher o sidebar -->
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button">
+                        <i class="fas fa-bars"></i>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Conteúdo alinhado à direita -->
+            <ul class="navbar-nav ms-auto mr-3">
+                <li class="nav-item d-flex align-items-center">
+                    <span class="me-3">Olá, {{ Auth::user()->name }}</span>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Sair</button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+
+
+        <!-- Sidebar -->
+        @include('components.sidebar.sidebar')
+
+        <!-- Conteúdo principal -->
+        <main class="content-wrapper p-4">
+            @yield('content')
+        </main>
+    </div>
+
+
+    <!-- Jquery -->
+    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+
+    <!-- AdminLTE JS -->
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.0.0/dist/js/adminlte.min.js"></script>
+
+    {{-- Jquery Mask --}}
+    <script src="{{ asset('vendor/jquery-mask-plugin/jquery.mask.min.js') }}"></script>
+
+    {{-- Jquery Validation --}}
+    <script src="{{ asset('vendor/jquery-validation/js/jquery.validate.min.js') }}"></script>
+
+    {{-- select2 --}}
+    <script src="{{ asset('vendor/select2/js/select2.min.js') }}"></script>
+
+    {{-- toastr --}}
+    <script src="{{ asset('vendor/toastr/js/toastr.min.js') }}"></script>
+
+
+
+
+    <!-- Scripts adicionais -->
+    @stack('scripts')
+
+
+
+</body>
+
+</html>

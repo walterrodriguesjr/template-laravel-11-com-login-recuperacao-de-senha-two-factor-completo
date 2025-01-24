@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PerfilController;
 
 /**
  * Redireciona '/' com base na autenticação do usuário.
@@ -28,6 +29,11 @@ Route::get('/login', function () {
     return view('login.login');
 })->name('login');
 
+Route::get('/logout', function () {
+    return redirect()->route('login')->with('info', 'Por favor, faça login para acessar esta página.');
+})->name('logout.get');
+
+
 Route::get('/forgot-password', function () {
     return view('password.forgot-password');
 })->name('password.request');
@@ -44,14 +50,18 @@ Route::post('/reset-password', [PasswordController::class, 'resetPassword'])
 /**
  * Rotas Protegidas (Requer autenticação)
  */
-Route::get('/main', function () {
-    return view('main.main');
-})->middleware(['auth', 'two-factor.verified'])->name('main');
+Route::middleware(['auth', 'two-factor.verified'])->group(function () {
+    // Rota principal
+    Route::get('/main', function () {
+        return view('layouts.main');
+    })->name('main');
 
+    // Rota de logout
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::post('/logout', [AuthController::class, 'logout'])
-    ->middleware('auth') // Use 'auth' em vez de 'auth:sanctum'
-    ->name('logout');
+    // Recurso perfil
+    Route::resource('perfil', PerfilController::class);
+});
 
 
 /**
