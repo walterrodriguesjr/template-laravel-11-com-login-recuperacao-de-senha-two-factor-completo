@@ -19,6 +19,10 @@
         "@popperjs/core": "^2.11.8",
         "admin-lte": "^4.0.0-beta3",
         "bootstrap": "^5.3.3",
-        "jquery": "^3.7.1"
+        "jquery": "^3.7.1",
+        "jquery-mask-plugin": "^1.14.16",
+        "jquery-validation": "^1.21.0",
+        "select2": "^4.1.0-rc.0",
+        "toastr": "^2.1.4"
     }
 }

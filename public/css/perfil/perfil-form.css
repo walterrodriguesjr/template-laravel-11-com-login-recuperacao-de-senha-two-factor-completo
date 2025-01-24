@@ -1,0 +1,13 @@
+/* Estilo para as mensagens de validação */
+label.error {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Para destacar o input com erro */
+input.error, select.error {
+    border-color: red;
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+}

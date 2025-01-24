@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,8 +12,18 @@
     <!-- Font Awesome via CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="{{ asset('vendor/select2/css/select2.min.css') }}">
+
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="{{ asset('vendor/toastr/css/toastr.min.css') }}">
+
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="{{ asset('css/perfil/perfil-form.css') }}">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed sidebar-collapse">
     <div class="wrapper">
         <!-- Navbar -->
@@ -25,7 +36,7 @@
                     </a>
                 </li>
             </ul>
-        
+
             <!-- Conteúdo alinhado à direita -->
             <ul class="navbar-nav ms-auto mr-3">
                 <li class="nav-item d-flex align-items-center">
@@ -37,7 +48,7 @@
                 </li>
             </ul>
         </nav>
-        
+
 
         <!-- Sidebar -->
         @include('components.sidebar.sidebar')
@@ -48,15 +59,33 @@
         </main>
     </div>
 
-    <!-- AdminLTE JS via CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+    <!-- Jquery -->
+    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+
+    <!-- AdminLTE JS -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.0.0/dist/js/adminlte.min.js"></script>
 
-    <script>
-        $(document).ready(function () {
-            console.log('AdminLTE Sidebar está funcionando!');
-        });
-    </script>
+    {{-- Jquery Mask --}}
+    <script src="{{ asset('vendor/jquery-mask-plugin/jquery.mask.min.js') }}"></script>
+
+    {{-- Jquery Validation --}}
+    <script src="{{ asset('vendor/jquery-validation/js/jquery.validate.min.js') }}"></script>
+
+    {{-- select2 --}}
+    <script src="{{ asset('vendor/select2/js/select2.min.js') }}"></script>
+
+    {{-- toastr --}}
+    <script src="{{ asset('vendor/toastr/js/toastr.min.js') }}"></script>
+
+
+
+
+    <!-- Scripts adicionais -->
     @stack('scripts')
+
+
+
 </body>
+
 </html>
