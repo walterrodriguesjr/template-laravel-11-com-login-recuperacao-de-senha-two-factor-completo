@@ -48,9 +48,6 @@ Route::get('/reset-password/{token}', [PasswordController::class, 'showResetForm
 Route::post('/reset-password', [PasswordController::class, 'resetPassword'])
     ->name('password.update');
 
-Route::post('/alterar-senha', [PasswordController::class, 'alterarSenha'])
-    ->middleware('auth') // Apenas para usuários logados
-    ->name('password.change');
 
 
 /**
@@ -64,6 +61,16 @@ Route::middleware(['auth', 'two-factor.verified'])->group(function () {
 
     // Rota de logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    //alterar a senha estando logado
+    Route::post('/alterar-senha', [PasswordController::class, 'alterarSenha'])
+        ->middleware('auth') // Apenas para usuários logados
+        ->name('password.change');
+
+    //alterar autenticacao dois fatores estando logado
+    Route::post('/atualizar-2fa', [TwoFactorController::class, 'atualizarAutenticacaoDoisFatores'])
+        ->name('two-factor.update')
+        ->middleware('auth'); // Garantir que só usuários logados alterem a configuração
 
     //Rota de escritório
     Route::resource('escritorio', EscritorioController::class);

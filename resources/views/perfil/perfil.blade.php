@@ -156,6 +156,63 @@
         </div>
     </div>
 
+    <!-- Autenticação de Dois Fatores -->
+    <div class="col-md-12">
+        <div class="card card-outline card-primary collapsed-card">
+            <div class="card-header d-flex align-items-center" data-card-widget="collapse">
+                <h3 class="card-title m-0">Autenticação de Dois Fatores</h3>
+                <div class="card-tools ml-auto">
+                    <button type="button" class="btn btn-tool">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <form id="formAutenticacaoDoisFatores">
+                    @csrf
+
+                    <!-- Mensagem condicional -->
+                    <div id="mensagem2FA"
+                        class="alert {{ Auth::user()->two_factor_enabled ? 'alert-info' : 'alert-danger' }}">
+                        {{ Auth::user()->two_factor_enabled
+                            ? 'Sua autenticação de dois fatores já está ativa. Caso queira desabilitar, clique no botão abaixo.'
+                            : 'Clique para habilitar sua autenticação de dois fatores.' }}
+                    </div>
+
+                    <!-- Opção para ativar/desativar (Switch estilo Apple) -->
+                    <div class="form-group">
+                        <label for="switch2FA">Ativar Autenticação de Dois Fatores?</label>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="switch2FA" name="dois_fatores"
+                                {{ Auth::user()->two_factor_enabled ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="switch2FA"></label>
+                        </div>
+                    </div>
+
+                    <!-- Seleção do método (somente aparece se 2FA estiver ativado) -->
+                    <div class="form-group" id="metodoAutenticacao"
+                        style="display: {{ Auth::user()->two_factor_enabled ? 'block' : 'none' }};">
+                        <label>Escolha o método de autenticação</label>
+                        <select class="form-control select2" id="tipoAutenticacao" name="tipo_autenticacao"
+                            style="width: 100%;">
+                            <option value="email" {{ Auth::user()->two_factor_type == 'email' ? 'selected' : '' }}>E-mail
+                            </option>
+                            {{-- <option value="sms" {{ Auth::user()->two_factor_type == 'sms' ? 'selected' : '' }}>SMS
+                            </option> --}}
+                            {{-- <option value="app" {{ Auth::user()->two_factor_type == 'app' ? 'selected' : '' }}>Google
+                                Authenticator</option> --}}
+                        </select>
+                    </div>
+
+                    <button type="button" class="btn btn-success float-right"
+                        id="buttonAlterarLaterarAutenticaoDoisFatores">
+                        <i class="fas fa-lock"></i> Atualizar Segurança
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 
@@ -165,6 +222,11 @@
 
     {{-- Scripts Alterar Senha --}}
     <script src="{{ asset('js/perfil/alterar-senha/alterar-senha-form-update.js') }}"></script>
+
+    {{-- Scripts Alterar Autenticacao de dois fatores --}}
+    <script
+        src="{{ asset('js/perfil/alterar-autenticacao-dois-fatores/alterar-autenticacao-dois-fatores-form-update.js') }}">
+    </script>
 
     <script>
         const userId = "{{ Auth::id() }}"; // Armazena o ID do usuário logado
