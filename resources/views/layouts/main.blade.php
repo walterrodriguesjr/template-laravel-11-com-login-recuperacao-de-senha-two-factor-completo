@@ -18,8 +18,11 @@
     <!-- Toastr CSS -->
     <link rel="stylesheet" href="{{ asset('vendor/toastr/css/toastr.min.css') }}">
 
-    <!-- CSS personalizado -->
+    <!-- CSS personalizado view perfil-->
     <link rel="stylesheet" href="{{ asset('css/perfil/perfil-form.css') }}">
+
+    <!-- CSS personalizado view escritorio-->
+    <link rel="stylesheet" href="{{ asset('css/escritorio/escritorio-form.css') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -78,13 +81,8 @@
     {{-- toastr --}}
     <script src="{{ asset('vendor/toastr/js/toastr.min.js') }}"></script>
 
-
-
-
     <!-- Scripts adicionais -->
     @stack('scripts')
-
-
 
 </body>
 

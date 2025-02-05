@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\RateLimiter;
 
 

@@ -33,8 +33,14 @@
                 data-accordion="false">
                 <li class="nav-item">
                     <a href="{{ route('main') }}" class="nav-link">
-                        <i class="nav-icon fas fa-home"></i>
+                        <i class="nav-icon fas fa-chart-bar"></i>
                         <p>Dashboard</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('escritorio.index') }}" class="nav-link">
+                        <i class="nav-icon fas fa-home"></i>
+                        <p>Escritório</p>
                     </a>
                 </li>
                 <li class="nav-item">

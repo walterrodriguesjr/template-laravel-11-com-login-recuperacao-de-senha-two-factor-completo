@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controller as RoutingController;
 use Illuminate\Support\Facades\Auth;
 
 
-class TwoFactorController extends Controller
+class TwoFactorController extends RoutingController
 {
     public function verifyTwoFactor(Request $request)
     {

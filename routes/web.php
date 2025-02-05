@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EscritorioController;
 use App\Http\Controllers\PerfilController;
 
 /**
@@ -47,6 +48,11 @@ Route::get('/reset-password/{token}', [PasswordController::class, 'showResetForm
 Route::post('/reset-password', [PasswordController::class, 'resetPassword'])
     ->name('password.update');
 
+Route::post('/alterar-senha', [PasswordController::class, 'alterarSenha'])
+    ->middleware('auth') // Apenas para usuários logados
+    ->name('password.change');
+
+
 /**
  * Rotas Protegidas (Requer autenticação)
  */
@@ -59,7 +65,10 @@ Route::middleware(['auth', 'two-factor.verified'])->group(function () {
     // Rota de logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Recurso perfil
+    //Rota de escritório
+    Route::resource('escritorio', EscritorioController::class);
+
+    // Rota de perfil
     Route::resource('perfil', PerfilController::class);
 });
 
@@ -68,17 +77,16 @@ Route::middleware(['auth', 'two-factor.verified'])->group(function () {
  * Rotas de autenticação
  */
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login');
- Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/register', [AuthController::class, 'register'])->name('register');
 
- Route::get('/two-factor', [TwoFactorController::class, 'showTwoFactorForm'])
- ->middleware('auth')
- ->name('two-factor.show');
+Route::get('/two-factor', [TwoFactorController::class, 'showTwoFactorForm'])
+    ->middleware('auth')
+    ->name('two-factor.show');
 
 Route::post('/two-factor', [TwoFactorController::class, 'verifyTwoFactor'])
- ->middleware('auth')
- ->name('two-factor.verify');
+    ->middleware('auth')
+    ->name('two-factor.verify');
 
 Route::post('/two-factor/resend', [TwoFactorController::class, 'resendTwoFactorCode'])
- ->middleware('auth')
- ->name('two-factor.resend');
-
+    ->middleware('auth')
+    ->name('two-factor.resend');

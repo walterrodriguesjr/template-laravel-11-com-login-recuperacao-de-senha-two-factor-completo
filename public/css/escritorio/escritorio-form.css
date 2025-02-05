@@ -1,0 +1,3 @@
+.card.card-outline.card-primary {
+    border-top: 3px solid #007bff !important; /* Azul padrão do Bootstrap */
+}

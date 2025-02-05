@@ -39,6 +39,11 @@ class User extends Authenticatable
         return $this->hasOne(UserData::class);
     }
 
+    public function escritorio()
+    {
+    return $this->hasOne(Escritorio::class, 'user_id');
+    }
+
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPasswordNotification($token));
