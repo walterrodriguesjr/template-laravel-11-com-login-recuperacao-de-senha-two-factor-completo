@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EscritorioController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\SessaoController;
 
 /**
  * Redireciona '/' com base na autenticação do usuário.
@@ -71,6 +72,16 @@ Route::middleware(['auth', 'two-factor.verified'])->group(function () {
     Route::post('/atualizar-2fa', [TwoFactorController::class, 'atualizarAutenticacaoDoisFatores'])
         ->name('two-factor.update')
         ->middleware('auth'); // Garantir que só usuários logados alterem a configuração
+
+    Route::get('/sessoes-ativas', [SessaoController::class, 'listarSessoesAtivas'])
+        ->name('sessoes.ativas');
+
+    Route::post('/sessoes-ativas/logout/{id}', [SessaoController::class, 'encerrarSessao'])
+        ->name('sessoes.encerrar');
+
+    Route::post('/sessoes-ativas/logout-all', [SessaoController::class, 'encerrarTodasSessoes'])
+        ->name('sessoes.encerrar-todas');
+
 
     //Rota de escritório
     Route::resource('escritorio', EscritorioController::class);

@@ -213,6 +213,40 @@
         </div>
     </div>
 
+    <div class="col-md-12">
+        <div class="card card-outline card-primary collapsed-card">
+            <div class="card-header d-flex align-items-center" data-card-widget="collapse">
+                <h3 class="card-title m-0">Gerenciamento de Sessões Ativas</h3>
+                <div class="card-tools ml-auto">
+                    <button type="button" class="btn btn-tool">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>IP</th>
+                            <th>Dispositivo</th>
+                            <th>Última Atividade</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaSessoes">
+                        <tr>
+                            <td colspan="4" class="text-center">Carregando sessões ativas...</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button id="encerrarTodasSessoes" class="btn btn-danger float-right mt-2">
+                    <i class="fas fa-sign-out-alt"></i> Encerrar todas as sessões
+                </button>
+            </div>
+        </div>
+    </div>
+
+
 @endsection
 
 
@@ -226,6 +260,11 @@
     {{-- Scripts Alterar Autenticacao de dois fatores --}}
     <script
         src="{{ asset('js/perfil/alterar-autenticacao-dois-fatores/alterar-autenticacao-dois-fatores-form-update.js') }}">
+    </script>
+
+    {{-- Scripts Gerenciar Sessões Ativas --}}
+    <script
+        src="{{ asset('js/perfil/gerenciar-sessoes-ativas/gerenciar-sessoes-ativas-form.js') }}">
     </script>
 
     <script>
