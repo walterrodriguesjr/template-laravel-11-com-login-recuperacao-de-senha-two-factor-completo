@@ -82,6 +82,10 @@ Route::middleware(['auth', 'two-factor.verified'])->group(function () {
     Route::post('/sessoes-ativas/logout-all', [SessaoController::class, 'encerrarTodasSessoes'])
         ->name('sessoes.encerrar-todas');
 
+    Route::get('/perfil/exportar-dados', [PerfilController::class, 'exportarDados'])
+        ->middleware('auth')
+        ->name('perfil.exportar-dados');
+
 
     //Rota de escritório
     Route::resource('escritorio', EscritorioController::class);

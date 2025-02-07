@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Notifications\LoginFailedTooManyTimes;
+use App\Notifications\LoginSuccessful;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -41,43 +43,62 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-    {
-        try {
-            // Validação básica
-            $request->validate([
-                'email' => 'required|email',
-                'password' => 'required',
-            ]);
+{
+    try {
+        // Validação básica
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-            // Verifica se o e-mail existe
-            $user = User::where('email', $request->email)->first();
-            if (!$user) {
-                return back()->withErrors(['email' => 'E-mail não cadastrado.'])->withInput();
-            }
+        // Busca o usuário
+        $user = User::where('email', $request->email)->first();
 
-            // Verifica credenciais
-            if (!Auth::attempt($request->only('email', 'password'))) {
-                return back()->withErrors(['password' => 'Senha incorreta.'])->withInput();
-            }
+        if (!$user) {
+            return back()->withErrors(['email' => 'E-mail não cadastrado.'])->withInput();
+        }
 
-            // Login bem-sucedido
-            $user = Auth::user();
+        // Contador de tentativas de login falhas (Throttle)
+        $maxAttempts = 5; // Número máximo de tentativas antes do bloqueio
+        $lockoutTime = 60; // Tempo de bloqueio em segundos (1 minuto)
+        $key = 'login_attempts_' . $request->ip();
 
-            // Verifica se o 2FA está habilitado
-            if ($user->two_factor_enabled) {
-                $user->generateTwoFactorCode(); // Gera o código de 2FA
-                $user->sendTwoFactorCode(); // Envia o código por e-mail ou SMS
-
-                // Redireciona para a verificação de 2FA
-                return redirect()->route('two-factor.show')->with('status', 'Código de verificação enviado.');
-            }
-            // Se o 2FA não estiver habilitado, redireciona para a rota principal
-            return redirect()->route('main')->with('success', 'Bem-vindo, ' . $user->name);
-        } catch (ThrottleRequestsException $e) {
-            // Redireciona com mensagem amigável
+        if (cache()->has($key) && cache()->get($key) >= $maxAttempts) {
+            // Enviar e-mail de alerta de tentativas falhas ao usuário
+            $user->notify(new LoginFailedTooManyTimes());
             return back()->withErrors(['throttle' => 'Muitas tentativas de login. Tente novamente em 1 minuto.'])->withInput();
         }
+
+        // Verifica credenciais
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            cache()->increment($key, 1);
+            cache()->put($key, cache()->get($key, 0) + 1, now()->addSeconds($lockoutTime));
+            return back()->withErrors(['password' => 'Senha incorreta.'])->withInput();
+        }
+
+        // Limpa tentativas falhas após login bem-sucedido
+        cache()->forget($key);
+
+        // Login bem-sucedido
+        $user = Auth::user();
+
+        // Verifica se o 2FA está habilitado
+        if ($user->two_factor_enabled) {
+            $user->generateTwoFactorCode(); // Gera o código de 2FA
+            $user->sendTwoFactorCode(); // Envia o código por e-mail ou SMS
+
+            return redirect()->route('two-factor.show')->with('status', 'Código de verificação enviado.');
+        }
+
+        // Se 2FA não estiver ativado, enviar e-mail de login bem-sucedido
+        $user->notify(new LoginSuccessful());
+
+        return redirect()->route('main')->with('success', 'Bem-vindo, ' . $user->name);
+    } catch (ThrottleRequestsException $e) {
+        return back()->withErrors(['throttle' => 'Muitas tentativas de login. Tente novamente em 1 minuto.'])->withInput();
     }
+}
+
 
     public function logout(Request $request)
     {

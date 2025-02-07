@@ -3,6 +3,7 @@
 @section('title', 'Perfil')
 
 @section('content')
+    {{-- Dados Pessoais --}}
     <div class="col-md-12">
         <div class="card card-outline card-primary collapsed-card">
             <div class="card-header d-flex align-items-center" data-card-widget="collapse">
@@ -14,6 +15,13 @@
                 </div>
             </div>
             <div class="card-body">
+
+                <!-- Aviso de Segurança e LGPD -->
+                <div id="mensagemSeguranca" class="alert alert-info">
+                    <i class="fas fa-shield-alt"></i> Seus dados pessoais são armazenados de forma segura e criptografada,
+                    conforme a <strong>Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018)</strong>.
+                </div>
+
                 <form id="meus-dados-form" method="POST" novalidate>
                     @csrf
                     <!-- Nome -->
@@ -118,8 +126,7 @@
         </div>
     </div>
 
-
-    <!-- Atualizar Senha -->
+    <!-- Alterar Senha -->
     <div class="col-md-12">
         <div class="card card-outline card-primary collapsed-card">
             <div class="card-header d-flex align-items-center" data-card-widget="collapse">
@@ -131,6 +138,26 @@
                 </div>
             </div>
             <div class="card-body">
+                <!-- Aviso sobre os requisitos da senha -->
+                <div id="mensagemSenha" class="alert alert-warning">
+                    <i class="fas fa-exclamation-circle"></i> Sua nova senha deve conter:
+                    <ul class="mb-0">
+                        <li id="requisito-comprimento"><i class="fas fa-times-circle text-danger"></i> Pelo menos
+                            <strong>8 caracteres</strong>
+                        </li>
+                        <li id="requisito-maiuscula"><i class="fas fa-times-circle text-danger"></i> Uma <strong>letra
+                                maiúscula</strong></li>
+                        <li id="requisito-minuscula"><i class="fas fa-times-circle text-danger"></i> Uma <strong>letra
+                                minúscula</strong></li>
+                        <li id="requisito-numero"><i class="fas fa-times-circle text-danger"></i> Um
+                            <strong>número</strong>
+                        </li>
+                        <li id="requisito-especial"><i class="fas fa-times-circle text-danger"></i> Um <strong>caractere
+                                especial</strong> (@, $, !, %, *, ?, &...)</li>
+                    </ul>
+                </div>
+
+
                 <form id="alterar-senha-form" method="POST">
                     @csrf
                     <div class="form-group">
@@ -148,9 +175,9 @@
                         <input type="password" class="form-control" id="confirmarSenha" name="nova_senha_confirmation"
                             required placeholder="Confirme sua nova senha">
                     </div>
-                    <button type="button" class="btn btn-success float-right" id="buttonAlterarSenha"><i
-                            class="fas fa-save"></i> Alterar
-                        Senha</button>
+                    <button type="button" class="btn btn-success float-right" id="buttonAlterarSenha">
+                        <i class="fas fa-save"></i> Alterar Senha
+                    </button>
                 </form>
             </div>
         </div>
@@ -171,12 +198,28 @@
                 <form id="formAutenticacaoDoisFatores">
                     @csrf
 
-                    <!-- Mensagem condicional -->
+                    <!-- Mensagem condicional sobre status da 2FA -->
                     <div id="mensagem2FA"
                         class="alert {{ Auth::user()->two_factor_enabled ? 'alert-info' : 'alert-danger' }}">
                         {{ Auth::user()->two_factor_enabled
                             ? 'Sua autenticação de dois fatores já está ativa. Caso queira desabilitar, clique no botão abaixo.'
                             : 'Clique para habilitar sua autenticação de dois fatores.' }}
+
+                        <!-- Texto explicativo adicionado abaixo da mensagem condicional -->
+                        @if (!Auth::user()->two_factor_enabled)
+                            <br><br>
+                            <strong>Proteja sua conta!</strong> A <strong>Autenticação de Dois Fatores (2FA)</strong>
+                            adiciona
+                            uma camada extra de segurança à sua conta, dificultando acessos não autorizados, mesmo que sua
+                            senha seja comprometida.
+                            <br><br>
+                            Ao ativar a 2FA, será necessário confirmar sua identidade através de um segundo fator (e-mail)
+                            sempre que fizer login, tornando sua conta muito mais segura contra invasões e tentativas de
+                            fraude.
+                            <br><br>
+                            Recomendamos fortemente que você ative esse recurso para garantir a <strong>máxima
+                                segurança</strong> dos seus dados e informações pessoais.
+                        @endif
                     </div>
 
                     <!-- Opção para ativar/desativar (Switch estilo Apple) -->
@@ -197,10 +240,8 @@
                             style="width: 100%;">
                             <option value="email" {{ Auth::user()->two_factor_type == 'email' ? 'selected' : '' }}>E-mail
                             </option>
-                            {{-- <option value="sms" {{ Auth::user()->two_factor_type == 'sms' ? 'selected' : '' }}>SMS
-                            </option> --}}
-                            {{-- <option value="app" {{ Auth::user()->two_factor_type == 'app' ? 'selected' : '' }}>Google
-                                Authenticator</option> --}}
+                            {{-- <option value="sms" {{ Auth::user()->two_factor_type == 'sms' ? 'selected' : '' }}>SMS</option> --}}
+                            {{-- <option value="app" {{ Auth::user()->two_factor_type == 'app' ? 'selected' : '' }}>Google Authenticator</option> --}}
                         </select>
                     </div>
 
@@ -213,6 +254,7 @@
         </div>
     </div>
 
+    <!-- Gerenciamento de Sessões Ativas -->
     <div class="col-md-12">
         <div class="card card-outline card-primary collapsed-card">
             <div class="card-header d-flex align-items-center" data-card-widget="collapse">
@@ -224,6 +266,12 @@
                 </div>
             </div>
             <div class="card-body">
+                <!-- Aviso informativo -->
+                <div id="mensagemSessoes" class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Aqui você pode visualizar e encerrar acessos ativos à sua conta em
+                    outros dispositivos.
+                </div>
+
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -246,6 +294,42 @@
         </div>
     </div>
 
+    <!-- Exportação de Dados -->
+    <div class="col-md-12">
+        <div class="card card-outline card-primary collapsed-card">
+            <div class="card-header d-flex align-items-center" data-card-widget="collapse">
+                <h3 class="card-title m-0">Exportação de Dados</h3>
+                <div class="card-tools ml-auto">
+                    <button type="button" class="btn btn-tool">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Alerta informativo sobre a LGPD e GDPR -->
+                <div id="mensagemLGPD" class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> <strong> Atenção:</strong> Esta funcionalidade está em conformidade
+                    com a
+                    <strong>Lei Geral de Proteção de Dados (LGPD, Art. 18, Incisos II e V)</strong> e o
+                    <strong>Regulamento Geral de Proteção de Dados (GDPR, Art. 15 e 20)</strong>.
+                    Como titular dos dados, você tem o direito de acessar e exportar suas informações pessoais armazenadas
+                    no sistema.
+                    <br><br>
+                    Para garantir a transparência e a segurança dos seus dados, todas as informações criptografadas
+                    serão devidamente <strong>descriptografadas</strong> antes da exportação, conforme previsto pela
+                    legislação, permitindo que você visualize suas informações de forma legível e acessível.
+                </div>
+
+                <p>Você pode baixar uma cópia dos seus dados armazenados no sistema nos formatos disponíveis.</p>
+                <button class="btn btn-primary" id="baixarDadosJSON">
+                    <i class="fas fa-download"></i> Baixar JSON
+                </button>
+                <button class="btn btn-success" id="baixarDadosCSV">
+                    <i class="fas fa-file-csv"></i> Baixar CSV
+                </button>
+            </div>
+        </div>
+    </div>
 
 @endsection
 
@@ -263,9 +347,10 @@
     </script>
 
     {{-- Scripts Gerenciar Sessões Ativas --}}
-    <script
-        src="{{ asset('js/perfil/gerenciar-sessoes-ativas/gerenciar-sessoes-ativas-form.js') }}">
-    </script>
+    <script src="{{ asset('js/perfil/gerenciar-sessoes-ativas/gerenciar-sessoes-ativas-form.js') }}"></script>
+
+    {{-- Scripts Exportar Dados --}}
+    <script src="{{ asset('js/perfil/exportar-dados/exportar-dados-form.js') }}"></script>
 
     <script>
         const userId = "{{ Auth::id() }}"; // Armazena o ID do usuário logado

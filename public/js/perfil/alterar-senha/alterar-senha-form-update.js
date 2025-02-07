@@ -22,6 +22,7 @@ $(document).ready(function () {
                 success: function (response) {
                     toastr.success(response.success);
                     $("#alterar-senha-form")[0].reset(); // Reseta os campos
+                    atualizarIndicadoresSenha(""); // Reseta os indicadores
                 },
                 error: function (xhr) {
                     if (xhr.status === 422) {
@@ -39,9 +40,8 @@ $(document).ready(function () {
         }
     });
 
-    // Validação do formulário com jQuery Validate
-     // Adiciona o método 'regex' para validação personalizada
-     $.validator.addMethod("regex", function (value, element, param) {
+    // Adiciona o método 'regex' para validação personalizada
+    $.validator.addMethod("regex", function (value, element, param) {
         return this.optional(element) || param.test(value);
     }, "A senha deve conter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma minúscula, um número e um caractere especial.");
 
@@ -72,4 +72,33 @@ $(document).ready(function () {
             },
         },
     });
+
+    // Evento para monitorar a digitação da senha e atualizar os indicadores
+    $("#novaSenha").on("input", function () {
+        atualizarIndicadoresSenha($(this).val());
+    });
+
+    function atualizarIndicadoresSenha(senha) {
+        let requisitos = {
+            comprimento: senha.length >= 8,
+            maiuscula: /[A-Z]/.test(senha),
+            minuscula: /[a-z]/.test(senha),
+            numero: /\d/.test(senha),
+            especial: /[@$!%*?&]/.test(senha),
+        };
+
+        // Atualiza os indicadores de cada requisito
+        $("#requisito-comprimento").html(requisitos.comprimento ? `<i class="fas fa-check-circle text-success"></i> Pelo menos <strong>8 caracteres</strong>` : `<i class="fas fa-times-circle text-danger"></i> Pelo menos <strong>8 caracteres</strong>`);
+        $("#requisito-maiuscula").html(requisitos.maiuscula ? `<i class="fas fa-check-circle text-success"></i> Uma <strong>letra maiúscula</strong>` : `<i class="fas fa-times-circle text-danger"></i> Uma <strong>letra maiúscula</strong>`);
+        $("#requisito-minuscula").html(requisitos.minuscula ? `<i class="fas fa-check-circle text-success"></i> Uma <strong>letra minúscula</strong>` : `<i class="fas fa-times-circle text-danger"></i> Uma <strong>letra minúscula</strong>`);
+        $("#requisito-numero").html(requisitos.numero ? `<i class="fas fa-check-circle text-success"></i> Um <strong>número</strong>` : `<i class="fas fa-times-circle text-danger"></i> Um <strong>número</strong>`);
+        $("#requisito-especial").html(requisitos.especial ? `<i class="fas fa-check-circle text-success"></i> Um <strong>caractere especial</strong>` : `<i class="fas fa-times-circle text-danger"></i> Um <strong>caractere especial</strong>`);
+
+        // Se todos os requisitos forem atendidos, muda a cor do alerta para verde
+        if (Object.values(requisitos).every(Boolean)) {
+            $("#mensagemSenha").removeClass("alert-warning").addClass("alert-success");
+        } else {
+            $("#mensagemSenha").removeClass("alert-success").addClass("alert-warning");
+        }
+    }
 });
