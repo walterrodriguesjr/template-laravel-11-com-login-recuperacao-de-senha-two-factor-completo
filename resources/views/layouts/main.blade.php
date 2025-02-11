@@ -28,6 +28,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
+
+
 <body class="hold-transition sidebar-mini layout-fixed sidebar-collapse">
     <div class="wrapper">
         <!-- Navbar -->

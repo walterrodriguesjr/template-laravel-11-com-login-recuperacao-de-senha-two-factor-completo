@@ -11,3 +11,13 @@ input.error, select.error {
     border-color: red;
     box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
 }
+
+.card.card-outline.card-primary {
+    border-top: 3px solid #007bff !important; /* Azul padrão do Bootstrap */
+}
+
+
+.card.card-outline.card-danger{
+    border-top: 3px solid #dc3545 !important; /* Vermelho padrão do Bootstrap */
+}
+

@@ -3,6 +3,10 @@
 @section('title', 'Perfil')
 
 @section('content')
+
+    @include('components.modal.perfil.confirmacao-excluir-conta')
+
+
     {{-- Dados Pessoais --}}
     <div class="col-md-12">
         <div class="card card-outline card-primary collapsed-card">
@@ -331,8 +335,67 @@
         </div>
     </div>
 
-@endsection
+    <!-- Exclusão de Conta -->
+    <div class="col-md-12">
+        <div class="card card-outline card-danger collapsed-card">
+            <div class="card-header d-flex align-items-center" data-card-widget="collapse">
+                <h3 class="card-title m-0">Excluir Conta</h3>
+                <div class="card-tools ml-auto">
+                    <button type="button" class="btn btn-tool">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Alerta de Atenção -->
+                <div id="mensagemExclusao" class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> <strong>Atenção!</strong>
+                    <br>
+                    Ao excluir sua conta, **todos os seus dados serão permanentemente apagados** e não poderão ser
+                    recuperados.
+                    <br><br>
+                    <strong>O que será excluído?</strong>
+                    <ul class="mb-0">
+                        <li>Seu perfil e credenciais de acesso.</li>
+                        <li>Todos os seus dados armazenados no sistema.</li>
+                        <li>Histórico de atividades e sessões ativas.</li>
+                    </ul>
+                    <br>
+                    <strong>Importante:</strong> Após confirmar a exclusão, seus dados serão apagados definitivamente
+                    conforme a Lei Geral de Proteção de Dados (LGPD)</strong>.
+                </div>
 
+                <!-- Formulário para confirmação da exclusão -->
+                <form id="formExcluirConta" method="POST">
+                    @csrf
+                    <div class="form-group">
+                        <label for="senhaConfirmacao">Digite sua senha para confirmar:</label>
+                        <input type="password" class="form-control" id="senhaConfirmacao" name="senha_confirmacao"
+                            required placeholder="Digite sua senha">
+                    </div>
+
+                    <!-- Checkbox de confirmação -->
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="confirmarExclusao">
+                            <label class="custom-control-label" for="confirmarExclusao">
+                                Eu entendo que esta ação é <strong>irreversível</strong> e desejo excluir minha conta.
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Botão de Exclusão -->
+                    <button type="button" class="btn btn-danger float-right" id="buttonExcluirConta" disabled>
+                        <i class="fas fa-trash"></i> Excluir Minha Conta
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+@endsection
 
 @push('scripts')
     {{-- Scripts Meus Dados --}}
@@ -351,6 +414,9 @@
 
     {{-- Scripts Exportar Dados --}}
     <script src="{{ asset('js/perfil/exportar-dados/exportar-dados-form.js') }}"></script>
+
+    {{-- Scripts Excluir Conta --}}
+    <script src="{{ asset('js/perfil/excluir-conta/excluir-conta-form.js') }}"></script>
 
     <script>
         const userId = "{{ Auth::id() }}"; // Armazena o ID do usuário logado

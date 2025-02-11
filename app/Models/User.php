@@ -14,6 +14,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+
     protected $fillable = [
         'name',
         'email',
@@ -42,7 +43,7 @@ class User extends Authenticatable
 
     public function escritorio()
     {
-    return $this->hasOne(Escritorio::class, 'user_id');
+        return $this->hasOne(Escritorio::class, 'user_id');
     }
 
     // Retorna todas as sessões ativas do usuário

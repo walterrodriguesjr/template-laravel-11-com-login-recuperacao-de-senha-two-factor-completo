@@ -83,8 +83,12 @@ Route::middleware(['auth', 'two-factor.verified'])->group(function () {
         ->name('sessoes.encerrar-todas');
 
     Route::get('/perfil/exportar-dados', [PerfilController::class, 'exportarDados'])
-        ->middleware('auth')
         ->name('perfil.exportar-dados');
+
+        Route::post('/validar-senha-exclusao', [PerfilController::class, 'validarSenhaExclusao']);
+        Route::post('/excluir-conta', [PerfilController::class, 'excluirConta']); // Mudando para refletir a função correta
+
+
 
 
     //Rota de escritório
