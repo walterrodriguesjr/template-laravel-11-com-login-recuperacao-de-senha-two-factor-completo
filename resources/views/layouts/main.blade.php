@@ -16,9 +16,6 @@
     <!-- Select2 CSS -->
     <link rel="stylesheet" href="{{ asset('vendor/select2/css/select2.min.css') }}">
 
-    <!-- Toastr CSS -->
-    <link rel="stylesheet" href="{{ asset('vendor/toastr/css/toastr.min.css') }}">
-
     <!-- Datatable CSS -->
     <link rel="stylesheet" href="{{ asset('vendor/datatable/css/dataTables.bootstrap5.min.css') }}">
 
@@ -86,9 +83,6 @@
 
     {{-- select2 --}}
     <script src="{{ asset('vendor/select2/js/select2.min.js') }}"></script>
-
-    {{-- toastr --}}
-    <script src="{{ asset('vendor/toastr/js/toastr.min.js') }}"></script>
 
     {{-- datatable --}}
     <script src="{{ asset('vendor/datatable/js/dataTables.min.js') }}"></script>
