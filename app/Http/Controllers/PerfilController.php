@@ -4,11 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Mail\CodigoExclusaoMail;
 use App\Models\ExclusaoConta;
+use App\Models\PerfilLog;
 use App\Models\User;
 use App\Models\UserData;
-use App\Notifications\CodigoExclusaoNotification;
 use App\Notifications\ExclusaoContaNotification;
-use Illuminate\Auth\Events\Validated;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
@@ -18,14 +17,11 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use League\Csv\Writer;
-
-use function Illuminate\Log\log;
 
 class PerfilController extends Controller
 {
@@ -57,37 +53,46 @@ class PerfilController extends Controller
      * Display the specified resource.
      */
     public function show(string $id)
-    {
-        try {
-            $user = User::findOrFail($id);
+{
+    try {
+        $user = User::findOrFail($id);
+        $userData = $user->userData;
 
-            return response()->json([
-                'success' => true,
-                'dados' => [
-                    'nome_usuario' => $user->name,
-                    'email_usuario' => $user->email,
-                    'cpf_usuario' => $user->userData ? Crypt::decryptString($user->userData->cpf) : null,
-                    'celular_usuario' => $user->userData ? Crypt::decryptString($user->userData->celular) : null,
-                    'data_nascimento_usuario' => $user->userData->data_nascimento ?? null, // Sem descriptografar
-                    'estado_usuario' => $user->userData->estado ?? null,
-                    'cidade_usuario' => $user->userData->cidade ?? null,
-                    'oab_usuario' => $user->userData ? Crypt::decryptString($user->userData->oab) : null,
-                    'estado_oab_usuario' => $user->userData->estado_oab ?? null,
-                ],
-            ]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Usuário não encontrado.',
-            ], 404);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erro ao buscar os dados do usuário.',
-                'error' => $e->getMessage(), // Remova em produção
-            ], 500);
-        }
+        // Obtém o caminho correto da foto
+        $fotoPath = $userData && $userData->foto 
+            ? asset("storage/foto-perfil/{$userData->foto}") 
+            : asset("storage/foto-perfil/sem-foto.jpg");
+
+        return response()->json([
+            'success' => true,
+            'dados' => [
+                'nome_usuario' => $user->name,
+                'email_usuario' => $user->email,
+                'cpf_usuario' => $userData ? Crypt::decryptString($userData->cpf) : null,
+                'celular_usuario' => $userData ? Crypt::decryptString($userData->celular) : null,
+                'data_nascimento_usuario' => $userData->data_nascimento ?? null, // Sem descriptografar
+                'estado_usuario' => $userData->estado ?? null,
+                'cidade_usuario' => $userData->cidade ?? null,
+                'oab_usuario' => $userData ? Crypt::decryptString($userData->oab) : null,
+                'estado_oab_usuario' => $userData->estado_oab ?? null,
+                'foto_usuario' => $fotoPath,
+            ],
+        ]);
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Usuário não encontrado.',
+        ], 404);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Erro ao buscar os dados do usuário.',
+            'error' => $e->getMessage(), // Remova em produção
+        ], 500);
     }
+}
+
+
 
 
 
@@ -103,83 +108,167 @@ class PerfilController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {
-        try {
-            DB::beginTransaction();
+{
+    try {
+        DB::beginTransaction();
 
-            // Busca o usuário pelo ID
-            $user = User::findOrFail($id);
-            $userData = $user->userData;
-            $userDataId = $userData ? $userData->id : null;
+        // Busca o usuário pelo ID
+        $user = User::findOrFail($id);
+        $userData = $user->userData ?? new UserData(['user_id' => $user->id]);
 
-            // Validação dos dados
-            $validator = Validator::make($request->all(), [
-                'nome_usuario' => 'required|string|min:3|max:255',
-                'email_usuario' => 'required|email|max:255|unique:users,email,' . $user->id,
-                'cpf_usuario' => [
-                    'required',
-                    'string',
-                    'size:14',
-                    Rule::unique('user_data', 'cpf')->ignore($userDataId),
-                ],
-                'celular_usuario' => 'required|string|size:14',
-                'data_nascimento_usuario' => 'required|date|before:today',
-                'estado_usuario' => 'required|size:2',
-                'cidade_usuario' => 'required|string|max:255',
-                'oab_usuario' => 'nullable|numeric|digits_between:1,8',
-                'estado_oab_usuario' => 'nullable|string|size:2'
-            ]);
+        // Validação dos dados
+        $validator = Validator::make($request->all(), [
+            'nome_usuario' => 'required|string|min:3|max:255',
+            'email_usuario' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'cpf_usuario' => 'required|string|size:14',
+            'celular_usuario' => 'required|string|size:15',
+            'data_nascimento_usuario' => 'required|date|before:today',
+            'estado_usuario' => 'required|size:2',
+            'cidade_usuario' => 'required|string|max:255',
+            'oab_usuario' => 'nullable|numeric|digits_between:1,8',
+            'estado_oab_usuario' => 'nullable|string|size:2',
+            'foto_usuario' => 'nullable|image|mimes:jpeg,png,jpg|max:5120', // Valida imagem até 5MB
+        ]);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            // Atualiza os dados do usuário
-            $user->update([
-                'name' => $request->input('nome_usuario'),
-                'email' => $request->input('email_usuario'),
-            ]);
-
-            // Cria ou atualiza userData
-            if (!$userData) {
-                $userData = new UserData();
-                $userData->user_id = $user->id;
-            }
-
-            $userData->fill([
-                'cpf' => Crypt::encryptString($request->input('cpf_usuario')),
-                'celular' => Crypt::encryptString($request->input('celular_usuario')),
-                'data_nascimento' => $request->input('data_nascimento_usuario'), // Sem criptografia
-                'estado' => $request->input('estado_usuario'),
-                'cidade' => $request->input('cidade_usuario'),
-                'oab' => Crypt::encryptString($request->input('oab_usuario')),
-                'estado_oab' => $request->input('estado_oab_usuario')
-            ])->save();
-
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Dados atualizados com sucesso!',
-            ]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            DB::rollBack();
+        if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Usuário não encontrado.',
-            ], 404);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Erro ao atualizar os dados. Tente novamente mais tarde.',
-                'error' => $e->getMessage(), // Apenas para debug, remova em produção
-            ], 500);
+                'errors' => $validator->errors()
+            ], 422);
         }
+
+        // Garante que a pasta de fotos existe
+        $path = storage_path('app/public/foto-perfil');
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0777, true, true);
+        }
+
+        // Lista de campos monitorados para auditoria
+        $camposMonitorados = [
+            'name' => 'Nome',
+            'email' => 'E-mail',
+            'cpf_usuario' => 'CPF',
+            'celular_usuario' => 'Celular',
+            'data_nascimento_usuario' => 'Data de Nascimento',
+            'estado_usuario' => 'Estado',
+            'cidade_usuario' => 'Cidade',
+            'oab_usuario' => 'OAB',
+            'estado_oab_usuario' => 'Estado OAB',
+            'foto_usuario' => 'Foto de Perfil'
+        ];
+
+        $alteracoes = [];
+
+        // Captura os valores antigos antes da atualização
+        $valoresAntigos = [
+            'name' => $user->name,
+            'email' => $user->email,
+            'cpf_usuario' => $userData->cpf ? Crypt::decryptString($userData->cpf) : 'Não informado',
+            'celular_usuario' => $userData->celular ? Crypt::decryptString($userData->celular) : 'Não informado',
+            'data_nascimento_usuario' => $userData->data_nascimento ?? 'Não informado',
+            'estado_usuario' => $userData->estado ?? 'Não informado',
+            'cidade_usuario' => $userData->cidade ?? 'Não informado',
+            'oab_usuario' => $userData->oab ? Crypt::decryptString($userData->oab) : 'Não informado',
+            'estado_oab_usuario' => $userData->estado_oab ?? 'Não informado',
+            'foto_usuario' => $userData->foto ? asset("storage/foto-perfil/{$userData->foto}") : 'Sem foto'
+        ];
+
+        // Captura os valores novos
+        $valoresNovos = [
+            'name' => $request->input('nome_usuario'),
+            'email' => $request->input('email_usuario'),
+            'cpf_usuario' => $request->input('cpf_usuario'),
+            'celular_usuario' => $request->input('celular_usuario'),
+            'data_nascimento_usuario' => $request->input('data_nascimento_usuario'),
+            'estado_usuario' => $request->input('estado_usuario'),
+            'cidade_usuario' => $request->input('cidade_usuario'),
+            'oab_usuario' => $request->input('oab_usuario'),
+            'estado_oab_usuario' => $request->input('estado_oab_usuario'),
+            'foto_usuario' => $request->hasFile('foto_usuario') ? 'Atualizada' : $valoresAntigos['foto_usuario']
+        ];
+
+        // Salva a foto do usuário, removendo a anterior se existir
+        if ($request->hasFile('foto_usuario')) {
+            Log::info("Iniciando salvamento de imagem...");
+        
+            if ($userData->foto && Storage::exists("public/foto-perfil/{$userData->foto}")) {
+                Storage::delete("public/foto-perfil/{$userData->foto}");
+                Log::info("Imagem antiga removida: " . $userData->foto);
+            }
+        
+            $file = $request->file('foto_usuario');
+            $fileName = "foto-{$user->id}-" . now()->format('YmdHis') . "." . $file->getClientOriginalExtension();
+        
+            // Salva a imagem corretamente dentro de storage/app/public/foto-perfil/
+            $file->move(storage_path('app/public/foto-perfil'), $fileName);
+        
+            // Garante que o arquivo foi salvo
+            if (!file_exists(storage_path("app/public/foto-perfil/{$fileName}"))) {
+                Log::error("Erro ao salvar a imagem: " . storage_path("app/public/foto-perfil/{$fileName}"));
+                throw new \Exception("Erro ao salvar a imagem.");
+            }
+        
+            Log::info("Imagem salva com sucesso: " . storage_path("app/public/foto-perfil/{$fileName}"));
+        
+            // Atualiza o campo no banco de dados
+            $userData->foto = $fileName;
+        }
+        
+
+        // Grava todos os valores no log (mesmo que não tenham sido alterados)
+        foreach ($camposMonitorados as $campo => $label) {
+            $valorAntigo = $valoresAntigos[$campo] ?? 'Não informado';
+            $valorNovo = $valoresNovos[$campo] ?? 'Não informado';
+
+            $alteracoes[] = [
+                'user_id' => $user->id,
+                'campo' => $label,
+                'valor_anterior' => $valorAntigo,
+                'valor_novo' => $valorNovo,
+                'alterado_em' => now(),
+            ];
+        }
+
+        // Atualiza os dados do usuário
+        $user->update([
+            'name' => $request->input('nome_usuario'),
+            'email' => $request->input('email_usuario'),
+        ]);
+
+        // Atualiza os dados do usuário no userData
+        $userData->fill([
+            'cpf' => Crypt::encryptString($request->input('cpf_usuario')),
+            'celular' => Crypt::encryptString($request->input('celular_usuario')),
+            'data_nascimento' => $request->input('data_nascimento_usuario'),
+            'estado' => $request->input('estado_usuario'),
+            'cidade' => $request->input('cidade_usuario'),
+            'oab' => Crypt::encryptString($request->input('oab_usuario')),
+            'estado_oab' => $request->input('estado_oab_usuario')
+        ])->save();
+
+        // Registra as alterações no banco
+        PerfilLog::insert($alteracoes);
+
+        DB::commit();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Dados atualizados com sucesso!',
+            'dados' => [
+                'foto_usuario' => $userData->foto ? asset("storage/foto-perfil/{$userData->foto}") : asset("storage/foto-perfil/sem-foto.jpg")
+            ]
+        ]);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'success' => false,
+            'message' => 'Erro ao atualizar os dados. Tente novamente mais tarde.',
+            'error' => $e->getMessage(),
+        ], 500);
     }
+}
+
+
 
 
     /**
@@ -507,5 +596,16 @@ class PerfilController extends Controller
         } catch (\Exception $e) {
             return 'Erro ao descriptografar';
         }
+    }
+
+    public function historicoAlteracoes()
+    {
+        $userId = auth()->id();
+
+        $historico = PerfilLog::where('user_id', $userId)
+            ->orderBy('alterado_em', 'desc')
+            ->get();
+
+        return response()->json($historico);
     }
 }

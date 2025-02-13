@@ -14,7 +14,8 @@ class UserData extends Model
         'estado',
         'oab',
         'estado_oab',
-        'data_nascimento'
+        'data_nascimento',
+        'foto'
     ];
 
     public function user()

@@ -17,9 +17,12 @@
 
             <!-- Foto do usuário -->
             <div class="image">
-                <img src="https://adminlte.io/themes/v3/dist/img/user2-160x160.jpg" class="img-circle elevation-2"
-                    alt="User Image">
+                <img src="{{ Auth::user()->userData && Auth::user()->userData->foto 
+                    ? asset('storage/foto-perfil/' . Auth::user()->userData->foto) 
+                    : asset('storage/foto-perfil/sem-foto.jpg') }}" 
+                    class="img-circle elevation-2" alt="User Image">
             </div>
+            
 
             <!-- Nome do usuário -->
             <div class="info">

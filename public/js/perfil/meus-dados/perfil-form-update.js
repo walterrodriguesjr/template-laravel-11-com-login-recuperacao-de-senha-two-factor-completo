@@ -32,16 +32,41 @@ $(document).ready(function () {
                 $("#estadoUsuario").val(response.dados.estado_usuario).trigger("change");
                 carregarCidades(response.dados.estado_usuario, response.dados.cidade_usuario);
 
-                $('#oabUsuario').val(response.dados.oab_usuario);
+                $("#oabUsuario").val(response.dados.oab_usuario);
                 if (response.dados.estado_oab_usuario) {
                     $("#estadoOabUsuario").val(response.dados.estado_oab_usuario).trigger("change");
                 }
+
+                // Exibe a foto do usuário ou a imagem padrão
+                $("#fotoPreview").attr("src", response.dados.foto_usuario);
             } else {
-                toastr.error(response.message || "Erro ao carregar os dados do usuário.");
+                Swal.fire({
+                    icon: "error",
+                    title: "Erro",
+                    text: response.message || "Erro ao carregar os dados do usuário.",
+                    confirmButtonText: "<i class='fas fa-check'></i> OK"
+                });
             }
         },
         error: function () {
-            toastr.error("Erro ao carregar os dados. Tente novamente.");
+            Swal.fire({
+                icon: "error",
+                title: "Erro",
+                text: "Erro ao carregar os dados. Tente novamente.",
+                confirmButtonText: "<i class='fas fa-check'></i> OK"
+            });
+        }
+    });
+
+    // Atualiza a pré-visualização da foto antes do upload
+    $("#fotoUsuario").change(function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                $("#fotoPreview").attr("src", e.target.result);
+            };
+            reader.readAsDataURL(file);
         }
     });
 
@@ -66,16 +91,16 @@ $(document).ready(function () {
                     $estadoUsuario.append(option);
                     $estadoOabUsuario.append(option);
                 });
-                // Inicializa ou atualiza o Select2 após carregar os estados
                 initializeSelect2($estadoUsuario, "Selecione um estado");
                 initializeSelect2($estadoOabUsuario, "Selecione um estado da OAB");
             },
             error: function () {
-                toastr.error("Erro ao carregar estados. Por favor, tente novamente.");
-                $estadoUsuario.empty().append('<option value="">Estado não disponível</option>');
-                $estadoOabUsuario.empty().append('<option value="">Estado não disponível</option>');
-                initializeSelect2($estadoUsuario, "Estado não disponível");
-                initializeSelect2($estadoOabUsuario, "Estado não disponível");
+                Swal.fire({
+                    icon: "error",
+                    title: "Erro",
+                    text: "Erro ao carregar estados. Por favor, tente novamente.",
+                    confirmButtonText: "<i class='fas fa-check'></i> OK"
+                });
             }
         });
     }
@@ -100,13 +125,15 @@ $(document).ready(function () {
                         `<option value="${cidade.nome}" ${cidade.nome === cidadeSelecionada ? 'selected' : ''}>${cidade.nome}</option>`
                     );
                 });
-                // Atualiza o Select2 após carregar as cidades
                 initializeSelect2($cidadeUsuario, "Selecione uma cidade");
             },
             error: function () {
-                toastr.error("Erro ao carregar cidades. Por favor, tente novamente.");
-                $cidadeUsuario.prop("disabled", true).empty().append('<option value="">Cidades não disponíveis</option>');
-                initializeSelect2($cidadeUsuario, "Cidades não disponíveis");
+                Swal.fire({
+                    icon: "error",
+                    title: "Erro",
+                    text: "Erro ao carregar cidades. Por favor, tente novamente.",
+                    confirmButtonText: "<i class='fas fa-check'></i> OK"
+                });
             }
         });
     }
@@ -117,87 +144,145 @@ $(document).ready(function () {
         carregarCidades(estadoSelecionado);
     });
 
-    // Inicializa carregando os estados
     carregarEstados();
 
     // Máscaras e formatações
-    $("#nomeUsuario").on("input", function () {
-        const valorFormatado = $(this).val()
-            .toLowerCase()
-            .replace(/\b\w/g, (char) => char.toUpperCase());
-        $(this).val(valorFormatado);
-    });
-
     $("#cpfUsuario").mask("000.000.000-00");
-    $("#celularUsuario").mask("(00)00000-0000");
+    $("#celularUsuario").mask("(00) 00000-0000");
     $("#oabUsuario").mask("00000000");
-
-    // Validação do formulário
-    $("#meus-dados-form").validate({
-        rules: {
-            nome_usuario: { required: true, minlength: 3 },
-            email_usuario: { required: true, email: true },
-            cpf_usuario: { required: true, minlength: 14, maxlength: 14 },
-            celular_usuario: { required: true, minlength: 14, maxlength: 14 },
-            data_nascimento_usuario: { required: true, date: true },
-            estado_usuario: { required: true },
-            cidade_usuario: { required: true },
-        },
-        messages: {
-            nome_usuario: { required: "O nome é obrigatório.", minlength: "O nome deve ter pelo menos 3 caracteres." },
-            email_usuario: { required: "O email é obrigatório.", email: "Insira um email válido." },
-            cpf_usuario: { required: "O CPF é obrigatório.", minlength: "O CPF deve ter 14 caracteres no formato correto." },
-            celular_usuario: { required: "O celular é obrigatório.", minlength: "O celular deve ter 14 caracteres no formato correto." },
-            data_nascimento_usuario: { required: "A data de nascimento é obrigatória.", date: "Insira uma data válida." },
-            estado_usuario: { required: "O estado é obrigatório." },
-            cidade_usuario: { required: "A cidade é obrigatória." },
-        },
-        submitHandler: function (form) {
-            alert("Formulário validado com sucesso!");
-            form.submit();
-        },
-    });
 
     // Evento de salvar os dados do formulário
     $("#buttonSalvarDadosUsuarios").click(function (e) {
         e.preventDefault();
-        if ($("#meus-dados-form").valid()) {
-            toastr.info("Salvando dados...");
-            const formData = {
-                nome_usuario: $("#nomeUsuario").val(),
-                email_usuario: $("#emailUsuario").val(),
-                cpf_usuario: $("#cpfUsuario").val(),
-                celular_usuario: $("#celularUsuario").val(),
-                data_nascimento_usuario: $("#dataNascimentoUsuario").val(),
-                estado_usuario: $("#estadoUsuario").val(),
-                cidade_usuario: $("#cidadeUsuario").val(),
-                oab_usuario: $("#oabUsuario").val(),
-                estado_oab_usuario: $("#estadoOabUsuario").val(),
-            };
 
-            $.ajax({
-                url: perfilUpdateUrl, // URL gerada dinamicamente no Blade
-                type: "PUT",
-                data: formData,
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken // Token CSRF gerado no Blade
-                },
-                success: function () {
-                    toastr.success("Dados atualizados com sucesso!");
-                },
-                error: function (xhr) {
+        const formData = new FormData();
+        formData.append("_method", "PUT"); // Define explicitamente o método PUT
+        formData.append("nome_usuario", $("#nomeUsuario").val());
+        formData.append("email_usuario", $("#emailUsuario").val());
+        formData.append("cpf_usuario", $("#cpfUsuario").val());
+        formData.append("celular_usuario", $("#celularUsuario").val());
+        formData.append("data_nascimento_usuario", $("#dataNascimentoUsuario").val());
+        formData.append("estado_usuario", $("#estadoUsuario").val());
+        formData.append("cidade_usuario", $("#cidadeUsuario").val());
+        formData.append("oab_usuario", $("#oabUsuario").val());
+        formData.append("estado_oab_usuario", $("#estadoOabUsuario").val());
+
+        // Adiciona a foto ao FormData se o usuário selecionou uma
+        const fotoFile = $("#fotoUsuario")[0].files[0];
+        if (fotoFile) {
+            formData.append("foto_usuario", fotoFile);
+        }
+
+        let loadingSwal = Swal.fire({
+            title: "Salvando...",
+            text: "Aguarde enquanto seus dados estão sendo atualizados.",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        let requestStartTime = new Date().getTime(); // Marca o tempo de início da requisição
+        let minWaitTime = 1500; // Tempo mínimo de exibição do spinner (1,5 segundos)
+        let maxWaitTime = 10000; // Tempo máximo de espera (10 segundos)
+        let timeoutReached = false; // Controle do timeout
+
+        // **Define um timeout para forçar um erro após 10 segundos**
+        let timeout = setTimeout(() => {
+            timeoutReached = true;
+            Swal.close();
+            Swal.fire({
+                icon: "error",
+                title: "Erro",
+                text: "A requisição demorou muito para responder. Tente novamente.",
+                confirmButtonText: "<i class='fas fa-check'></i> OK"
+            });
+        }, maxWaitTime);
+
+        $.ajax({
+            url: perfilUpdateUrl, // URL gerada dinamicamente no Blade
+            type: "POST", // Enviar como POST e forçar PUT via _method
+            data: formData,
+            contentType: false,
+            processData: false,
+            headers: {
+                "X-CSRF-TOKEN": csrfToken
+            },
+            success: function (response) {
+                clearTimeout(timeout); // Cancela o timeout caso a requisição seja bem-sucedida
+
+                if (timeoutReached) return; // Se o timeout foi atingido, ignora a resposta
+
+                let requestEndTime = new Date().getTime(); // Marca o tempo de finalização da requisição
+                let elapsedTime = requestEndTime - requestStartTime; // Calcula o tempo de execução
+
+                setTimeout(() => {
+                    Swal.close(); // Fecha o alerta de carregamento após o tempo mínimo
+
+                    if (response.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Sucesso!",
+                            text: "Dados atualizados com sucesso.",
+                            confirmButtonText: "<i class='fas fa-check'></i> OK"
+                        });
+
+                        // Obtém a nova URL da foto do usuário
+                        let novaFoto = response.dados.foto_usuario;
+
+                        // Atualiza a imagem no perfil (onde o usuário editou)
+                        $("#fotoPreview").attr("src", novaFoto);
+
+                        // Atualiza a imagem do usuário no sidebar sem precisar recarregar a página
+                        $(".sidebar .image img").attr("src", novaFoto);
+
+                        atualizarHistoricoAlteracoes();
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Erro",
+                            text: response.message || "Houve um erro ao atualizar os dados.",
+                            confirmButtonText: "<i class='fas fa-check'></i> OK"
+                        });
+                    }
+                }, Math.max(minWaitTime - elapsedTime, 0)); // Garante tempo mínimo de 1,5 segundos
+            },
+            error: function (xhr) {
+                clearTimeout(timeout); // Cancela o timeout caso a requisição falhe
+
+                if (timeoutReached) return; // Se o timeout foi atingido, ignora a resposta
+
+                let requestEndTime = new Date().getTime();
+                let elapsedTime = requestEndTime - requestStartTime;
+
+                setTimeout(() => {
+                    Swal.close(); // Fecha o alerta de carregamento após tempo mínimo
+
                     if (xhr.status === 422) {
                         const errors = xhr.responseJSON.errors;
+                        let errorMessage = "Ocorreram os seguintes erros:\n";
                         Object.keys(errors).forEach(function (key) {
-                            toastr.error(errors[key]);
+                            errorMessage += `• ${errors[key]}\n`;
+                        });
+
+                        Swal.fire({
+                            icon: "error",
+                            title: "Erro na validação",
+                            text: errorMessage,
+                            confirmButtonText: "<i class='fas fa-check'></i> OK"
                         });
                     } else {
-                        toastr.error("Erro ao salvar os dados. Tente novamente.");
+                        Swal.fire({
+                            icon: "error",
+                            title: "Erro",
+                            text: "Erro ao salvar os dados. Tente novamente.",
+                            confirmButtonText: "<i class='fas fa-check'></i> OK"
+                        });
                     }
-                }
-            });
-        } else {
-            toastr.warning("Preencha todos os campos obrigatórios.");
-        }
+                }, Math.max(minWaitTime - elapsedTime, 0)); // Garante tempo mínimo de 1,5 segundos
+            }
+        });
     });
 });

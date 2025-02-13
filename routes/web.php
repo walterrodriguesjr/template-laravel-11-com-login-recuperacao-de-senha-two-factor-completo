@@ -85,11 +85,10 @@ Route::middleware(['auth', 'two-factor.verified'])->group(function () {
     Route::get('/perfil/exportar-dados', [PerfilController::class, 'exportarDados'])
         ->name('perfil.exportar-dados');
 
-        Route::post('/validar-senha-exclusao', [PerfilController::class, 'validarSenhaExclusao']);
-        Route::post('/excluir-conta', [PerfilController::class, 'excluirConta']); // Mudando para refletir a função correta
+    Route::get('/perfil/historico', [PerfilController::class, 'historicoAlteracoes']);
 
-
-
+    Route::post('/validar-senha-exclusao', [PerfilController::class, 'validarSenhaExclusao']);
+    Route::post('/excluir-conta', [PerfilController::class, 'excluirConta']); // Mudando para refletir a função correta
 
     //Rota de escritório
     Route::resource('escritorio', EscritorioController::class);

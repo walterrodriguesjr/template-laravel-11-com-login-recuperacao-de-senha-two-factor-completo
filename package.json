@@ -26,6 +26,7 @@
         "jquery-mask-plugin": "^1.14.16",
         "jquery-validation": "^1.21.0",
         "select2": "^4.1.0-rc.0",
+        "sweetalert2": "^11.16.0",
         "toastr": "^2.1.4"
     }
 }

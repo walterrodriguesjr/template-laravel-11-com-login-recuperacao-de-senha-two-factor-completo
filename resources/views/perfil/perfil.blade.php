@@ -8,127 +8,144 @@
 
 
     {{-- Dados Pessoais --}}
-    <div class="col-md-12">
-        <div class="card card-outline card-primary collapsed-card">
-            <div class="card-header d-flex align-items-center" data-card-widget="collapse">
-                <h3 class="card-title m-0">Dados Pessoais</h3>
-                <div class="card-tools ml-auto">
-                    <button type="button" class="btn btn-tool">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-
-                <!-- Aviso de Segurança e LGPD -->
-                <div id="mensagemSeguranca" class="alert alert-info">
-                    <i class="fas fa-shield-alt"></i> Seus dados pessoais são armazenados de forma segura e criptografada,
-                    conforme a <strong>Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018)</strong>.
-                </div>
-
-                <form id="meus-dados-form" method="POST" novalidate>
-                    @csrf
-                    <!-- Nome -->
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="nomeUsuario">Nome</label>
-                            <input type="text" class="form-control" id="nomeUsuario" name="nome_usuario"
-                                value="{{ Auth::user()->name }}" required>
-                        </div>
-                    </div>
-
-                    <!-- Email -->
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="emailUsuario">Email</label>
-                            <input type="email" class="form-control" id="emailUsuario" name="email_usuario"
-                                value="{{ Auth::user()->email }}" required>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- CPF -->
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="cpfUsuario">CPF</label>
-                                <input type="text" class="form-control" id="cpfUsuario" name="cpf_usuario"
-                                    placeholder="Digite seu CPF">
-                            </div>
-                        </div>
-
-                        <!-- Celular -->
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="celularUsuario">Celular</label>
-                                <input type="text" class="form-control" id="celularUsuario" name="celular_usuario"
-                                    placeholder="(00) 00000-0000">
-                            </div>
-                        </div>
-
-                        <!-- Data de Nascimento -->
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="dataNascimentoUsuario">Data de Nascimento</label>
-                                <input type="date" class="form-control" id="dataNascimentoUsuario"
-                                    name="data_nascimento_usuario">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- Estado -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="estadoUsuario">Estado</label>
-                                <select class="form-control" id="estadoUsuario" name="estado_usuario" style="width: 100%;">
-                                    <option value="">Selecione um estado</option>
-                                </select>
-                            </div>
-                        </div>
-                        <!-- Cidade -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="cidadeUsuario">Cidade</label>
-                                <select class="form-control" id="cidadeUsuario" name="cidade_usuario" style="width: 100%;">
-                                    <option value="">Selecione uma cidade</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- OAB -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="oabUsuario">OAB</label>
-                                <input type="text" class="form-control" id="oabUsuario" name="oab_usuario"
-                                    placeholder="Número da OAB">
-                            </div>
-                        </div>
-
-                        <!-- Estado OAB -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="estadoOabUsuario">Estado OAB</label>
-                                <select class="form-control" id="estadoOabUsuario" name="estado_oab_usuario"
-                                    style="width: 100%;">
-                                    <option value="">Selecione um estado da OAB</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-md-12 text-right">
-                            <button type="button" class="btn btn-success" id="buttonSalvarDadosUsuarios">
-                                <i class="fas fa-edit"></i> Atualizar Dados
-                            </button>
-                        </div>
-                    </div>
-                </form>
+<div class="col-md-12">
+    <div class="card card-outline card-primary collapsed-card">
+        <div class="card-header d-flex align-items-center" data-card-widget="collapse">
+            <h3 class="card-title m-0">Dados Pessoais</h3>
+            <div class="card-tools ml-auto">
+                <button type="button" class="btn btn-tool">
+                    <i class="fas fa-plus"></i>
+                </button>
             </div>
         </div>
+        <div class="card-body">
+
+            <!-- Aviso de Segurança e LGPD -->
+            <div id="mensagemSeguranca" class="alert alert-info">
+                <i class="fas fa-shield-alt"></i> Seus dados pessoais são armazenados de forma segura e criptografada,
+                conforme a <strong>Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018)</strong>.
+            </div>
+
+            <form id="meus-dados-form" method="POST" enctype="multipart/form-data" novalidate>
+                @csrf
+
+                <!-- Foto do Usuário -->
+                <div class="row mb-3">
+                    <div class="col-md-4 text-center">
+                        <label>Foto de Perfil</label>
+                        <div class="d-flex flex-column align-items-center">
+                            <img id="fotoPreview" 
+                                src="{{ asset(Auth::user()->foto ? 'storage/foto-perfil/' . Auth::user()->foto : 'storage/foto-perfil/sem-foto.jpg') }}" 
+                                class="rounded-circle border shadow-sm" 
+                                style="width: 120px; height: 120px; object-fit: cover;">
+                            
+                            <input type="file" class="form-control mt-2" id="fotoUsuario" name="foto_usuario" accept="image/*">
+                            <small class="text-muted">Apenas imagens (JPG, PNG, GIF). Tamanho máx: 5MB.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nome -->
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="nomeUsuario">Nome</label>
+                        <input type="text" class="form-control" id="nomeUsuario" name="nome_usuario"
+                            value="{{ Auth::user()->name }}" required>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="emailUsuario">Email</label>
+                        <input type="email" class="form-control" id="emailUsuario" name="email_usuario"
+                            value="{{ Auth::user()->email }}" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- CPF -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="cpfUsuario">CPF</label>
+                            <input type="text" class="form-control" id="cpfUsuario" name="cpf_usuario"
+                                placeholder="Digite seu CPF">
+                        </div>
+                    </div>
+
+                    <!-- Celular -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="celularUsuario">Celular</label>
+                            <input type="text" class="form-control" id="celularUsuario" name="celular_usuario"
+                                placeholder="(00) 00000-0000">
+                        </div>
+                    </div>
+
+                    <!-- Data de Nascimento -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="dataNascimentoUsuario">Data de Nascimento</label>
+                            <input type="date" class="form-control" id="dataNascimentoUsuario"
+                                name="data_nascimento_usuario">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Estado -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="estadoUsuario">Estado</label>
+                            <select class="form-control" id="estadoUsuario" name="estado_usuario" style="width: 100%;">
+                                <option value="">Selecione um estado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Cidade -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="cidadeUsuario">Cidade</label>
+                            <select class="form-control" id="cidadeUsuario" name="cidade_usuario" style="width: 100%;">
+                                <option value="">Selecione uma cidade</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- OAB -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="oabUsuario">OAB</label>
+                            <input type="text" class="form-control" id="oabUsuario" name="oab_usuario"
+                                placeholder="Número da OAB">
+                        </div>
+                    </div>
+
+                    <!-- Estado OAB -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="estadoOabUsuario">Estado OAB</label>
+                            <select class="form-control" id="estadoOabUsuario" name="estado_oab_usuario"
+                                style="width: 100%;">
+                                <option value="">Selecione um estado da OAB</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-12 text-right">
+                        <button type="button" class="btn btn-success" id="buttonSalvarDadosUsuarios">
+                            <i class="fas fa-edit"></i> Atualizar Dados
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 
     <!-- Alterar Senha -->
     <div class="col-md-12">
@@ -335,6 +352,47 @@
         </div>
     </div>
 
+    {{-- Histórico de Alterações --}}
+    <div class="col-md-12">
+        <div class="card card-outline card-primary collapsed-card">
+            <div class="card-header d-flex align-items-center" data-card-widget="collapse">
+                <h3 class="card-title m-0">Histórico de Alterações</h3>
+                <div class="card-tools ml-auto">
+                    <button type="button" class="btn btn-tool">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+
+                <!-- 🛡️ Mensagem de Informação sobre LGPD -->
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Aviso:</strong> O sistema armazena seu histórico de alterações de dados pessoais
+                    conforme recomendação da <strong>Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018)</strong>.
+                    Essa medida visa garantir transparência e segurança sobre suas informações.
+                </div>
+
+                <table class="table table-bordered" id="tabelaHistorico">
+                    <thead>
+                        <tr>
+                            <th>Campo</th>
+                            <th>Valor Anterior</th>
+                            <th>Valor Novo</th>
+                            <th>Data da Alteração</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historicoAlteracoes">
+                        <tr>
+                            <td colspan="4" class="text-center">Carregando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Exclusão de Conta -->
     <div class="col-md-12">
         <div class="card card-outline card-danger collapsed-card">
@@ -415,7 +473,10 @@
     {{-- Scripts Exportar Dados --}}
     <script src="{{ asset('js/perfil/exportar-dados/exportar-dados-form.js') }}"></script>
 
-    {{-- Scripts Excluir Conta --}}
+    {{-- Scripts Histótico de Alterações --}}
+    <script src="{{ asset('js/perfil/historico-alteracoes/historico-alteracoes-form.js') }}"></script>
+
+    {{-- Scripts Exluir Conta --}}
     <script src="{{ asset('js/perfil/excluir-conta/excluir-conta-form.js') }}"></script>
 
     <script>

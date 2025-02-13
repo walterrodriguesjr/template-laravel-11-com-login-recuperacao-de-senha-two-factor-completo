@@ -19,6 +19,12 @@
     <!-- Toastr CSS -->
     <link rel="stylesheet" href="{{ asset('vendor/toastr/css/toastr.min.css') }}">
 
+    <!-- Datatable CSS -->
+    <link rel="stylesheet" href="{{ asset('vendor/datatable/css/dataTables.bootstrap5.min.css') }}">
+
+    <!-- sweetalert CSS -->
+    <link rel="stylesheet" href="{{ asset('vendor/sweetalert/css/sweetalert2.min.css') }}">
+
     <!-- CSS personalizado view perfil-->
     <link rel="stylesheet" href="{{ asset('css/perfil/perfil-form.css') }}">
 
@@ -83,6 +89,15 @@
 
     {{-- toastr --}}
     <script src="{{ asset('vendor/toastr/js/toastr.min.js') }}"></script>
+
+    {{-- datatable --}}
+    <script src="{{ asset('vendor/datatable/js/dataTables.min.js') }}"></script>
+
+    {{-- datatable Bootstrap--}}
+    <script src="{{ asset('vendor/datatable/js/dataTables.bootstrap5.min.js') }}"></script>
+
+    {{-- sweetalert --}}
+    <script src="{{ asset('vendor/sweetalert/js/sweetalert2.all.min.js') }}"></script>
 
     <!-- Scripts adicionais -->
     @stack('scripts')

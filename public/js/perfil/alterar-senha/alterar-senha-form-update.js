@@ -4,7 +4,21 @@ $(document).ready(function () {
 
         // Verifica se o formulário está válido
         if ($("#alterar-senha-form").valid()) {
-            toastr.info("Alterando senha...");
+            let loadingSwal = Swal.fire({
+                title: "Alterando senha...",
+                text: "Aguarde enquanto sua senha está sendo atualizada.",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            let requestStartTime = new Date().getTime(); // Marca o tempo de início da requisição
+            let minWaitTime = 1500; // Tempo mínimo de exibição do spinner (1.5 segundos)
+            let maxWaitTime = 10000; // Tempo máximo de espera (10 segundos)
+            let timeoutReached = false; // Controle do timeout
 
             const formData = {
                 senha_atual: $("#senhaAtual").val(),
@@ -13,6 +27,18 @@ $(document).ready(function () {
                 _token: csrfToken, // Token CSRF
             };
 
+            // **Define um timeout para forçar um erro após 10 segundos**
+            let timeout = setTimeout(() => {
+                timeoutReached = true;
+                Swal.close();
+                Swal.fire({
+                    icon: "error",
+                    title: "Erro",
+                    text: "A requisição demorou muito para responder. Tente novamente.",
+                    confirmButtonText: "<i class='fas fa-check'></i> OK"
+                });
+            }, maxWaitTime);
+
             // Faz a requisição AJAX
             $.ajax({
                 url: "/alterar-senha",
@@ -20,23 +46,69 @@ $(document).ready(function () {
                 data: formData,
                 headers: { "X-CSRF-TOKEN": csrfToken },
                 success: function (response) {
-                    toastr.success(response.success);
-                    $("#alterar-senha-form")[0].reset(); // Reseta os campos
-                    atualizarIndicadoresSenha(""); // Reseta os indicadores
+                    clearTimeout(timeout); // Cancela o timeout caso a requisição seja bem-sucedida
+                    if (timeoutReached) return; // Se o timeout foi atingido, ignora a resposta
+
+                    let requestEndTime = new Date().getTime();
+                    let elapsedTime = requestEndTime - requestStartTime;
+
+                    setTimeout(() => {
+                        Swal.close(); // Fecha o alerta de carregamento após tempo mínimo
+                        Swal.fire({
+                            icon: "success",
+                            title: "Sucesso!",
+                            text: response.success,
+                            confirmButtonText: "<i class='fas fa-check'></i> OK"
+                        });
+
+                        $("#alterar-senha-form")[0].reset(); // Reseta os campos
+                        atualizarIndicadoresSenha(""); // Reseta os indicadores
+                    }, Math.max(minWaitTime - elapsedTime, 0));
                 },
                 error: function (xhr) {
-                    if (xhr.status === 422) {
-                        const errors = xhr.responseJSON.errors;
-                        Object.keys(errors).forEach(function (key) {
-                            toastr.error(errors[key]);
+                    clearTimeout(timeout); // Cancela o timeout caso a requisição falhe
+                    if (timeoutReached) return; // Se o timeout foi atingido, ignora a resposta
+
+                    let requestEndTime = new Date().getTime();
+                    let elapsedTime = requestEndTime - requestStartTime;
+
+                    setTimeout(() => {
+                        Swal.close(); // Fecha o alerta de carregamento após tempo mínimo
+
+                        let errorMessage = "Erro ao alterar a senha. Tente novamente.";
+
+                        if (xhr.status === 422) {
+                            // Se o backend retorna erro de validação
+                            if (xhr.responseJSON.errors) {
+                                const errors = xhr.responseJSON.errors;
+                                errorMessage = "Ocorreram os seguintes erros:\n";
+                                Object.keys(errors).forEach(function (key) {
+                                    errorMessage += `• ${errors[key]}\n`;
+                                });
+                            } 
+                            // Se o backend retorna a mensagem "A senha atual está incorreta"
+                            else if (xhr.responseJSON.error) {
+                                errorMessage = xhr.responseJSON.error;
+                            }
+                        }
+
+                        Swal.fire({
+                            icon: "error",
+                            title: "Erro",
+                            text: errorMessage,
+                            confirmButtonText: "<i class='fas fa-check'></i> OK"
                         });
-                    } else {
-                        toastr.error("Erro ao alterar a senha. Tente novamente.");
-                    }
+
+                    }, Math.max(minWaitTime - elapsedTime, 0));
                 }
             });
         } else {
-            toastr.warning("Preencha todos os campos corretamente.");
+            Swal.fire({
+                icon: "warning",
+                title: "Atenção",
+                text: "Preencha todos os campos corretamente.",
+                confirmButtonText: "<i class='fas fa-check'></i> OK"
+            });
         }
     });
 
@@ -94,7 +166,7 @@ $(document).ready(function () {
         $("#requisito-numero").html(requisitos.numero ? `<i class="fas fa-check-circle text-success"></i> Um <strong>número</strong>` : `<i class="fas fa-times-circle text-danger"></i> Um <strong>número</strong>`);
         $("#requisito-especial").html(requisitos.especial ? `<i class="fas fa-check-circle text-success"></i> Um <strong>caractere especial</strong>` : `<i class="fas fa-times-circle text-danger"></i> Um <strong>caractere especial</strong>`);
 
-        // Se todos os requisitos forem atendidos, muda a cor do alerta para verde
+        // **Se todos os requisitos forem atendidos, altera o fundo do checklist**
         if (Object.values(requisitos).every(Boolean)) {
             $("#mensagemSenha").removeClass("alert-warning").addClass("alert-success");
         } else {

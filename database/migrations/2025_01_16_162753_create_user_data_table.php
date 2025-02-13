@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('oab')->nullable(); // Número da OAB (se aplicável)
             $table->string('estado_oab')->nullable(); // Estado da OAB
             $table->date('data_nascimento')->nullable();
+            $table->string('foto')->nullable()->after('estado_oab');
             $table->timestamps();
         });
     }

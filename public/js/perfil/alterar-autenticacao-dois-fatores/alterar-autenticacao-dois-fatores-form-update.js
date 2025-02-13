@@ -29,10 +29,6 @@ $(document).ready(function () {
         }
     }
 
-
-
-
-
     atualizarMensagem(); // Aplica no carregamento da página
 
     // Atualiza dinamicamente ao clicar no toggle switch
@@ -53,17 +49,55 @@ $(document).ready(function () {
             _token: csrfToken
         };
 
+        // Exibe o SweetAlert de carregamento
+        let loadingSwal = Swal.fire({
+            title: "Atualizando autenticação...",
+            text: "Aguarde enquanto sua configuração de segurança está sendo atualizada.",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        let requestStartTime = new Date().getTime(); // Marca o tempo de início da requisição
+
         $.ajax({
             url: "/atualizar-2fa",
             type: "POST",
             data: formData,
             headers: { "X-CSRF-TOKEN": csrfToken },
             success: function (response) {
-                toastr.success(response.message);
-                atualizarMensagem();
+                let requestEndTime = new Date().getTime();
+                let elapsedTime = requestEndTime - requestStartTime;
+                let minWaitTime = 1000; // Tempo mínimo de exibição do spinner (1 segundo)
+
+                setTimeout(() => {
+                    Swal.close(); // Fecha o alerta de carregamento após tempo mínimo
+                    Swal.fire({
+                        icon: "success",
+                        title: "Sucesso!",
+                        text: response.message,
+                        confirmButtonText: "<i class='fas fa-check'></i> OK"
+                    });
+
+                    atualizarMensagem(); // Atualiza a mensagem na interface
+                }, Math.max(minWaitTime - elapsedTime, 0));
             },
-            error: function (xhr) {
-                toastr.error("Erro ao atualizar configuração de segurança.");
+            error: function () {
+                let requestEndTime = new Date().getTime();
+                let elapsedTime = requestEndTime - requestStartTime;
+
+                setTimeout(() => {
+                    Swal.close(); // Fecha o alerta de carregamento após tempo mínimo
+                    Swal.fire({
+                        icon: "error",
+                        title: "Erro",
+                        text: "Erro ao atualizar configuração de segurança.",
+                        confirmButtonText: "<i class='fas fa-check'></i> OK"
+                    });
+                }, Math.max(minWaitTime - elapsedTime, 0));
             }
         });
     });

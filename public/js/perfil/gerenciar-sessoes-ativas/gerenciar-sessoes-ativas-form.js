@@ -29,58 +29,159 @@ $(document).ready(function () {
                 });
             },
             error: function () {
-                toastr.error("Erro ao carregar sessões ativas.");
+                Swal.fire({
+                    icon: "error",
+                    title: "Erro",
+                    text: "Erro ao carregar sessões ativas.",
+                    confirmButtonText: "<i class='fas fa-check'></i> OK"
+                });
             },
         });
     }
 
-    // Encerrar sessão específica
+    // Encerrar sessão específica com confirmação
     $(document).on("click", ".encerrarSessao", function () {
         const sessaoId = $(this).data("id");
 
-        $.ajax({
-            url: `/sessoes-ativas/logout/${sessaoId}`,
-            type: "POST",
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-            },
-            success: function (response) {
-                if (response.logout) {
-                    toastr.success(response.message);
-                    setTimeout(() => {
-                        window.location.href = "/logout";
-                    }, 2000); // Redireciona para o login após 2 segundos
-                } else {
-                    toastr.success(response.message);
-                    carregarSessoesAtivas();
-                }
-            },
-            error: function () {
-                toastr.error("Erro ao encerrar sessão.");
-            },
+        Swal.fire({
+            title: "Tem certeza?",
+            text: "Essa ação encerrará a sessão selecionada!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "<i class='fas fa-check'></i> Sim",
+            cancelButtonText: "<i class='fas fa-times'></i> Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let loadingSwal = Swal.fire({
+                    title: "Encerrando sessão...",
+                    text: "Aguarde...",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                let requestStartTime = new Date().getTime();
+
+                $.ajax({
+                    url: `/sessoes-ativas/logout/${sessaoId}`,
+                    type: "POST",
+                    headers: { "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content") },
+                    success: function (response) {
+                        let requestEndTime = new Date().getTime();
+                        let elapsedTime = requestEndTime - requestStartTime;
+                        let minWaitTime = 1000;
+
+                        setTimeout(() => {
+                            Swal.close();
+
+                            Swal.fire({
+                                icon: "success",
+                                title: "Sessão encerrada!",
+                                text: response.message,
+                                confirmButtonText: "<i class='fas fa-check'></i> OK"
+                            });
+
+                            if (response.logout) {
+                                setTimeout(() => {
+                                    window.location.href = "/logout";
+                                }, 2000);
+                            } else {
+                                carregarSessoesAtivas();
+                            }
+                        }, Math.max(minWaitTime - elapsedTime, 0));
+                    },
+                    error: function () {
+                        let requestEndTime = new Date().getTime();
+                        let elapsedTime = requestEndTime - requestStartTime;
+
+                        setTimeout(() => {
+                            Swal.close();
+
+                            Swal.fire({
+                                icon: "error",
+                                title: "Erro",
+                                text: "Erro ao encerrar sessão.",
+                                confirmButtonText: "<i class='fas fa-check'></i> OK"
+                            });
+                        }, Math.max(minWaitTime - elapsedTime, 0));
+                    }
+                });
+            }
         });
     });
 
-    // Encerrar todas as sessões
+    // Encerrar todas as sessões com confirmação
     $("#encerrarTodasSessoes").click(function () {
-        $.ajax({
-            url: "/sessoes-ativas/logout-all",
-            type: "POST",
-            headers: { "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content") },
-            success: function (response) {
-                if (response.logout) {
-                    toastr.success(response.message);
-                    setTimeout(() => {
-                        window.location.href = "/login"; // Redireciona para login
-                    }, 2000);
-                } else {
-                    toastr.success(response.message);
-                    carregarSessoesAtivas(); // Atualiza a lista de sessões
-                }
-            },
-            error: function () {
-                toastr.error("Erro ao encerrar todas as sessões.");
-            },
+        Swal.fire({
+            title: "Tem certeza?",
+            text: "Todas as sessões ativas serão encerradas!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "<i class='fas fa-check'></i> Sim",
+            cancelButtonText: "<i class='fas fa-times'></i> Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let loadingSwal = Swal.fire({
+                    title: "Encerrando todas as sessões...",
+                    text: "Aguarde...",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                let requestStartTime = new Date().getTime();
+
+                $.ajax({
+                    url: "/sessoes-ativas/logout-all",
+                    type: "POST",
+                    headers: { "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content") },
+                    success: function (response) {
+                        let requestEndTime = new Date().getTime();
+                        let elapsedTime = requestEndTime - requestStartTime;
+                        let minWaitTime = 1000;
+
+                        setTimeout(() => {
+                            Swal.close();
+
+                            Swal.fire({
+                                icon: "success",
+                                title: "Sessões encerradas!",
+                                text: response.message,
+                                confirmButtonText: "<i class='fas fa-check'></i> OK"
+                            });
+
+                            if (response.logout) {
+                                setTimeout(() => {
+                                    window.location.href = "/login";
+                                }, 2000);
+                            } else {
+                                carregarSessoesAtivas();
+                            }
+                        }, Math.max(minWaitTime - elapsedTime, 0));
+                    },
+                    error: function () {
+                        let requestEndTime = new Date().getTime();
+                        let elapsedTime = requestEndTime - requestStartTime;
+
+                        setTimeout(() => {
+                            Swal.close();
+
+                            Swal.fire({
+                                icon: "error",
+                                title: "Erro",
+                                text: "Erro ao encerrar todas as sessões.",
+                                confirmButtonText: "<i class='fas fa-check'></i> OK"
+                            });
+                        }, Math.max(minWaitTime - elapsedTime, 0));
+                    }
+                });
+            }
         });
     });
 
