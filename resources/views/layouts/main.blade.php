@@ -22,6 +22,9 @@
     <!-- sweetalert CSS -->
     <link rel="stylesheet" href="{{ asset('vendor/sweetalert/css/sweetalert2.min.css') }}">
 
+    <!-- Choices.js CSS -->
+    <link rel="stylesheet" href="{{ asset('vendor/choices/css/choices.min.css') }}">
+
     <!-- CSS personalizado view perfil-->
     <link rel="stylesheet" href="{{ asset('css/perfil/perfil-form.css') }}">
 
@@ -87,11 +90,14 @@
     {{-- datatable --}}
     <script src="{{ asset('vendor/datatable/js/dataTables.min.js') }}"></script>
 
-    {{-- datatable Bootstrap--}}
+    {{-- datatable Bootstrap --}}
     <script src="{{ asset('vendor/datatable/js/dataTables.bootstrap5.min.js') }}"></script>
 
     {{-- sweetalert --}}
     <script src="{{ asset('vendor/sweetalert/js/sweetalert2.all.min.js') }}"></script>
+
+    <!-- Choices.js JS -->
+    <script src="{{ asset('vendor/choices/js/choices.min.js') }}"></script>
 
     <!-- Scripts adicionais -->
     @stack('scripts')

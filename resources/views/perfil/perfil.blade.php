@@ -4,8 +4,6 @@
 
 @section('content')
 
-    @include('components.modal.perfil.confirmacao-excluir-conta')
-
 
     {{-- Dados Pessoais --}}
 <div class="col-md-12">
