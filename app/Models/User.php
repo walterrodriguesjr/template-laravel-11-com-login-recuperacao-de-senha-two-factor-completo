@@ -6,12 +6,14 @@ use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
+
 
     protected $fillable = [
         'name',
@@ -33,6 +35,25 @@ class User extends Authenticatable
         'password' => 'hashed',
         'two_factor_expires_at' => 'datetime',
     ];
+
+    public function userData()
+    {
+        return $this->hasOne(UserData::class);
+    }
+
+    public function escritorio()
+    {
+        return $this->hasOne(Escritorio::class, 'user_id');
+    }
+
+    // Retorna todas as sessões ativas do usuário
+    public function activeSessions()
+    {
+        return DB::table('sessions')
+            ->where('user_id', $this->id)
+            ->orderBy('last_activity', 'desc')
+            ->get();
+    }
 
     public function sendPasswordResetNotification($token)
     {
@@ -56,4 +77,3 @@ class User extends Authenticatable
         }
     }
 }
-

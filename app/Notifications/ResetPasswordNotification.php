@@ -2,29 +2,45 @@
 
 namespace App\Notifications;
 
-use Illuminate\Notifications\Notification;
+use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class ResetPasswordNotification extends Notification
 {
-    public $token;
+    use Queueable;
 
+    protected $token;
+
+    /**
+     * Cria uma nova instância da notificação.
+     */
     public function __construct($token)
     {
         $this->token = $token;
     }
 
+    /**
+     * Define os canais de entrega da notificação.
+     */
     public function via($notifiable)
     {
         return ['mail'];
     }
 
+    /**
+     * Conteúdo do e-mail enviado ao usuário.
+     */
     public function toMail($notifiable)
-{
-    return (new MailMessage)
-        ->subject('Recuperação de Senha')
-        ->line('Você está recebendo este e-mail porque recebemos uma solicitação de redefinição de senha.')
-        ->action('Redefinir Senha', route('password.reset', ['token' => $this->token, 'email' => $notifiable->email]))
-        ->line('Se você não solicitou uma redefinição de senha, nenhuma ação adicional é necessária.');
-}
+    {
+        return (new MailMessage)
+            ->subject('🔐 Redefinição de Senha')
+            ->greeting('Olá, ' . $notifiable->name . '!')
+            ->line('Recebemos uma solicitação para redefinir sua senha.')
+            ->line('Se não foi você, ignore este e-mail.')
+            ->line('Caso queira prosseguir, clique no botão abaixo:')
+            ->action('Redefinir Senha', url('/reset-password/' . $this->token))
+            ->line('Se você não solicitou essa alteração, sua senha permanecerá inalterada.')
+            ->line('Mantenha sua conta segura!');
+    }
 }

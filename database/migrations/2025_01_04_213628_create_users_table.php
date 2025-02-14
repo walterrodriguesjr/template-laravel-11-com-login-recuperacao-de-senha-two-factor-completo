@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken(); // Para "lembrar-me"
             $table->timestamp('email_verified_at')->nullable();
-            
+
             // Campos para autenticação em duas etapas (2FA)
             $table->boolean('two_factor_enabled')->default(false); // Indica se o 2FA está ativado
             $table->string('two_factor_type')->nullable(); // Tipo de 2FA (e-mail, SMS, etc.)
