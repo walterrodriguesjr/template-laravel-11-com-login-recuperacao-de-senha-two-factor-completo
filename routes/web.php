@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\EscritorioController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SessaoController;
 
@@ -90,8 +89,6 @@ Route::middleware(['auth', 'two-factor.verified'])->group(function () {
     Route::post('/validar-senha-exclusao', [PerfilController::class, 'validarSenhaExclusao']);
     Route::post('/excluir-conta', [PerfilController::class, 'excluirConta']); // Mudando para refletir a função correta
 
-    //Rota de escritório
-    Route::resource('escritorio', EscritorioController::class);
 
     // Rota de perfil
     Route::resource('perfil', PerfilController::class);

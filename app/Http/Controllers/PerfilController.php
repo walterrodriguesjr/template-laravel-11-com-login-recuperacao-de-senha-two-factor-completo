@@ -73,8 +73,6 @@ class PerfilController extends Controller
                 'data_nascimento_usuario' => $userData->data_nascimento ?? null, // Sem descriptografar
                 'estado_usuario' => $userData->estado ?? null,
                 'cidade_usuario' => $userData->cidade ?? null,
-                'oab_usuario' => $userData ? Crypt::decryptString($userData->oab) : null,
-                'estado_oab_usuario' => $userData->estado_oab ?? null,
                 'foto_usuario' => $fotoPath,
             ],
         ]);
@@ -125,8 +123,6 @@ class PerfilController extends Controller
             'data_nascimento_usuario' => 'required|date|before:today',
             'estado_usuario' => 'required|size:2',
             'cidade_usuario' => 'required|string|max:255',
-            'oab_usuario' => 'nullable|numeric|digits_between:1,8',
-            'estado_oab_usuario' => 'nullable|string|size:2',
             'foto_usuario' => 'nullable|image|mimes:jpeg,png,jpg|max:5120', // Valida imagem até 5MB
         ]);
 
@@ -152,8 +148,6 @@ class PerfilController extends Controller
             'data_nascimento_usuario' => 'Data de Nascimento',
             'estado_usuario' => 'Estado',
             'cidade_usuario' => 'Cidade',
-            'oab_usuario' => 'OAB',
-            'estado_oab_usuario' => 'Estado OAB',
             'foto_usuario' => 'Foto de Perfil'
         ];
 
@@ -168,8 +162,6 @@ class PerfilController extends Controller
             'data_nascimento_usuario' => $userData->data_nascimento ?? 'Não informado',
             'estado_usuario' => $userData->estado ?? 'Não informado',
             'cidade_usuario' => $userData->cidade ?? 'Não informado',
-            'oab_usuario' => $userData->oab ? Crypt::decryptString($userData->oab) : 'Não informado',
-            'estado_oab_usuario' => $userData->estado_oab ?? 'Não informado',
             'foto_usuario' => $userData->foto ? asset("storage/foto-perfil/{$userData->foto}") : 'Sem foto'
         ];
 
@@ -182,8 +174,6 @@ class PerfilController extends Controller
             'data_nascimento_usuario' => $request->input('data_nascimento_usuario'),
             'estado_usuario' => $request->input('estado_usuario'),
             'cidade_usuario' => $request->input('cidade_usuario'),
-            'oab_usuario' => $request->input('oab_usuario'),
-            'estado_oab_usuario' => $request->input('estado_oab_usuario'),
             'foto_usuario' => $request->hasFile('foto_usuario') ? 'Atualizada' : $valoresAntigos['foto_usuario']
         ];
 
@@ -242,8 +232,6 @@ class PerfilController extends Controller
             'data_nascimento' => $request->input('data_nascimento_usuario'),
             'estado' => $request->input('estado_usuario'),
             'cidade' => $request->input('cidade_usuario'),
-            'oab' => Crypt::encryptString($request->input('oab_usuario')),
-            'estado_oab' => $request->input('estado_oab_usuario')
         ])->save();
 
         // Registra as alterações no banco
@@ -293,7 +281,6 @@ class PerfilController extends Controller
             abort_if(!$user, 403, 'Acesso negado.');
 
             $userData = $user->userData; // Dados adicionais do usuário
-            $escritorio = $user->escritorio; // Dados do escritório, se houver
 
             // Estrutura básica dos dados do usuário
             $dadosUsuario = [
@@ -314,28 +301,8 @@ class PerfilController extends Controller
                     'Celular' => $userData->celular ? Crypt::decryptString($userData->celular) : 'Não informado',
                     'Cidade' => $userData->cidade ?? 'Não informado',
                     'Estado' => $userData->estado ?? 'Não informado',
-                    'OAB' => $userData->oab ? Crypt::decryptString($userData->oab) : 'Não informado',
-                    'Estado da OAB' => $userData->estado_oab ?? 'Não informado',
                     'Data de Nascimento' => $userData->data_nascimento ? date('d/m/Y', strtotime($userData->data_nascimento)) : 'Não informado',
                 ]);
-            }
-
-            // Adiciona os dados do escritório, se existirem
-            $dadosEscritorio = [];
-            if ($escritorio) {
-                $dadosEscritorio = [
-                    'Nome do Escritório' => $escritorio->nome ?? 'Não informado',
-                    'CNPJ' => $escritorio->cnpj ?? 'Não informado',
-                    'Telefone' => $escritorio->telefone ?? 'Não informado',
-                    'Celular' => $escritorio->celular ?? 'Não informado',
-                    'E-mail' => $escritorio->email ?? 'Não informado',
-                    'CEP' => $escritorio->cep ?? 'Não informado',
-                    'Endereço' => $escritorio->logradouro ?? 'Não informado',
-                    'Número' => $escritorio->numero ?? 'Não informado',
-                    'Bairro' => $escritorio->bairro ?? 'Não informado',
-                    'Cidade' => $escritorio->cidade ?? 'Não informado',
-                    'Estado' => $escritorio->estado ?? 'Não informado',
-                ];
             }
 
             // Captura o histórico de logins do usuário
@@ -354,13 +321,12 @@ class PerfilController extends Controller
             abort_if(!in_array($formato, ['json', 'csv']), 400, 'Formato inválido.');
 
             if ($formato === 'csv') {
-                return $this->exportarComoCSV($dadosUsuario, $dadosEscritorio, $historicoLogins);
+                return $this->exportarComoCSV($dadosUsuario, $historicoLogins);
             }
 
             // Retorna os dados em JSON
             return response()->json([
                 'dados_usuario' => $dadosUsuario,
-                'dados_escritorio' => $dadosEscritorio,
                 'historico_logins' => $historicoLogins
             ], 200, [
                 'Content-Disposition' => 'attachment; filename="meus-dados.json"',
@@ -379,10 +345,10 @@ class PerfilController extends Controller
     /**
      * Exporta os dados como CSV
      */
-    private function exportarComoCSV($dadosUsuario, $dadosEscritorio, $historicoLogins)
+    private function exportarComoCSV($dadosUsuario, $historicoLogins)
     {
         try {
-            $response = new StreamedResponse(function () use ($dadosUsuario, $dadosEscritorio, $historicoLogins) {
+            $response = new StreamedResponse(function () use ($dadosUsuario, $historicoLogins) {
                 $handle = fopen('php://output', 'w');
 
                 // Escreve cabeçalhos do CSV
@@ -394,15 +360,6 @@ class PerfilController extends Controller
                 }
 
                 fputcsv($handle, ['']); // Linha em branco para separação
-
-                // Escreve os dados do escritório, se houver
-                if (!empty($dadosEscritorio)) {
-                    fputcsv($handle, ['Dados do Escritório']);
-                    foreach ($dadosEscritorio as $campo => $valor) {
-                        fputcsv($handle, [$campo, $valor]);
-                    }
-                    fputcsv($handle, ['']); // Linha em branco para separação
-                }
 
                 // Escreve o histórico de logins
                 fputcsv($handle, ['Histórico de Logins']);
@@ -552,25 +509,7 @@ class PerfilController extends Controller
             fputcsv($handle, ['Celular', $this->decryptSafe($user->userData->celular)]);
             fputcsv($handle, ['Cidade', $user->userData->cidade ?? 'Não informado']);
             fputcsv($handle, ['Estado', $user->userData->estado ?? 'Não informado']);
-            fputcsv($handle, ['OAB', $this->decryptSafe($user->userData->oab)]);
-            fputcsv($handle, ['Estado da OAB', $user->userData->estado_oab ?? 'Não informado']);
             fputcsv($handle, ['Data de Nascimento', $user->userData->data_nascimento ? date('d/m/Y', strtotime($user->userData->data_nascimento)) : 'Não informado']);
-        }
-
-        // Dados do escritório (caso tenha)
-        if ($user->escritorio) {
-            fputcsv($handle, ['Escritório', 'Dados do Escritório']);
-            fputcsv($handle, ['Nome do Escritório', $user->escritorio->nome ?? 'Não informado']);
-            fputcsv($handle, ['CNPJ', $user->escritorio->cnpj ?? 'Não informado']);
-            fputcsv($handle, ['Telefone', $user->escritorio->telefone ?? 'Não informado']);
-            fputcsv($handle, ['Celular', $user->escritorio->celular ?? 'Não informado']);
-            fputcsv($handle, ['E-mail', $user->escritorio->email ?? 'Não informado']);
-            fputcsv($handle, ['CEP', $user->escritorio->cep ?? 'Não informado']);
-            fputcsv($handle, ['Endereço', $user->escritorio->logradouro ?? 'Não informado']);
-            fputcsv($handle, ['Número', $user->escritorio->numero ?? 'Não informado']);
-            fputcsv($handle, ['Bairro', $user->escritorio->bairro ?? 'Não informado']);
-            fputcsv($handle, ['Cidade', $user->escritorio->cidade ?? 'Não informado']);
-            fputcsv($handle, ['Estado', $user->escritorio->estado ?? 'Não informado']);
         }
 
         // Histórico de sessões ativas do usuário

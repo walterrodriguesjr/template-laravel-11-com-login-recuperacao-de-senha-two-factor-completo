@@ -17,8 +17,8 @@ class AdminUserSeeder extends Seeder
     {
         $user = User::create([
             'name' => 'Admin',
-            'email' => 'walterrjr.86@gmail.com',
-            'password' => Hash::make('Pmprparana2025!'),
+            'email' => 'laravel_template@gmail.com',
+            'password' => Hash::make('Laraveltemplate001!'),
             'two_factor_enabled' => true, // Habilita o 2FA
             'two_factor_type' => 'email', // Define o tipo como e-mail
         ]);
@@ -28,11 +28,9 @@ class AdminUserSeeder extends Seeder
             'user_id' => $user->id,
             'cpf' => Crypt::encryptString('123.456.789-00'),
             'telefone' => Crypt::encryptString('(11) 4002-8922'),
-            'celular' => Crypt::encryptString('(41) 99999-8888'),
+            'celular' => Crypt::encryptString('(11) 98999-8888'),
             'cidade' => 'São Paulo',
             'estado' => 'SP',
-            'oab' => Crypt::encryptString('123456'),
-            'estado_oab' => 'SP',
             'data_nascimento' => '1990-01-01', // Mantém sem criptografia
         ]);
     }

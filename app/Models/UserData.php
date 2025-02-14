@@ -12,8 +12,6 @@ class UserData extends Model
         'celular',
         'cidade',
         'estado',
-        'oab',
-        'estado_oab',
         'data_nascimento',
         'foto'
     ];

@@ -33,7 +33,6 @@
 
         const $estadoUsuario = $("#estadoUsuario");
         const $cidadeUsuario = $("#cidadeUsuario");
-        const $estadoOabUsuario = $("#estadoOabUsuario");
 
         // Desabilita o select de cidade inicialmente
         $cidadeUsuario.prop("disabled", true);
@@ -46,17 +45,14 @@
                 dataType: "json",
                 success: function (data) {
                     $estadoUsuario.empty().append('<option value="">Selecione um estado</option>');
-                    $estadoOabUsuario.empty().append('<option value="">Selecione um estado da OAB</option>');
 
                     data.forEach(function (estado) {
                         const option = `<option value="${estado.sigla}">${estado.nome}</option>`;
                         $estadoUsuario.append(option);
-                        $estadoOabUsuario.append(option);
                     });
 
                     // Inicializa o Choices nos selects de estado
                     initializeChoices($estadoUsuario, "Selecione um estado");
-                    initializeChoices($estadoOabUsuario, "Selecione um estado da OAB");
 
                     // Se já temos dados do usuário carregados, setamos os valores
                     if (userProfileData) {
@@ -70,11 +66,6 @@
                                 .empty()
                                 .append('<option value="">Selecione uma cidade</option>');
                             initializeChoices($cidadeUsuario, "Selecione uma cidade");
-                        }
-
-                        // Ajusta o estado da OAB, se existir
-                        if (userProfileData.estado_oab_usuario) {
-                            setChoiceValue($estadoOabUsuario, userProfileData.estado_oab_usuario);
                         }
                     }
                 },
@@ -150,7 +141,6 @@
                         $("#cpfUsuario").val(userProfileData.cpf_usuario);
                         $("#celularUsuario").val(userProfileData.celular_usuario);
                         $("#dataNascimentoUsuario").val(userProfileData.data_nascimento_usuario);
-                        $("#oabUsuario").val(userProfileData.oab_usuario);
 
                         // Mostra a foto (ou imagem padrão)
                         $("#fotoPreview").attr("src", userProfileData.foto_usuario);
@@ -199,7 +189,6 @@
         // Máscaras e formatações
         $("#cpfUsuario").mask("000.000.000-00");
         $("#celularUsuario").mask("(00) 00000-0000");
-        $("#oabUsuario").mask("00000000");
 
         // Evento de salvar os dados do formulário
         $("#buttonSalvarDadosUsuarios").click(function (e) {
@@ -214,8 +203,6 @@
             formData.append("data_nascimento_usuario", $("#dataNascimentoUsuario").val());
             formData.append("estado_usuario", $estadoUsuario.val());
             formData.append("cidade_usuario", $cidadeUsuario.val());
-            formData.append("oab_usuario", $("#oabUsuario").val());
-            formData.append("estado_oab_usuario", $estadoOabUsuario.val());
 
             // Adiciona a foto ao FormData se o usuário selecionou uma
             const fotoFile = $("#fotoUsuario")[0].files[0];

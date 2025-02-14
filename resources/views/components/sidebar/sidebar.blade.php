@@ -4,7 +4,7 @@
     <a href="#" class="brand-link">
         <img src="https://adminlte.io/themes/v3/dist/img/AdminLTELogo.png" alt="AdminLTE Logo"
             class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">Gestão Jurídica</span>
+        <span class="brand-text font-weight-light">Nome Sistema</span>
     </a>
 
     <!-- Sidebar -->
@@ -17,12 +17,12 @@
 
             <!-- Foto do usuário -->
             <div class="image">
-                <img src="{{ Auth::user()->userData && Auth::user()->userData->foto 
-                    ? asset('storage/foto-perfil/' . Auth::user()->userData->foto) 
-                    : asset('storage/foto-perfil/sem-foto.jpg') }}" 
+                <img src="{{ Auth::user()->userData && Auth::user()->userData->foto
+                    ? asset('storage/foto-perfil/' . Auth::user()->userData->foto)
+                    : asset('storage/foto-perfil/sem-foto.jpg') }}"
                     class="img-circle elevation-2" alt="User Image">
             </div>
-            
+
 
             <!-- Nome do usuário -->
             <div class="info">
@@ -38,42 +38,6 @@
                     <a href="{{ route('main') }}" class="nav-link">
                         <i class="nav-icon fas fa-chart-bar"></i>
                         <p>Dashboard</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('escritorio.index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-home"></i>
-                        <p>Escritório</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-user"></i>
-                        <p>Clientes</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-gavel"></i>
-                        <p>Processos</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-file-alt"></i>
-                        <p>Documentos</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-cogs"></i>
-                        <p>Configurações</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('logout') }}" class="nav-link">
-                        <i class="nav-icon fas fa-sign-out-alt"></i>
-                        <p>Sair</p>
                     </a>
                 </li>
             </ul>

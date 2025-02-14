@@ -41,11 +41,6 @@ class User extends Authenticatable
         return $this->hasOne(UserData::class);
     }
 
-    public function escritorio()
-    {
-        return $this->hasOne(Escritorio::class, 'user_id');
-    }
-
     // Retorna todas as sessões ativas do usuário
     public function activeSessions()
     {

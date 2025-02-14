@@ -11,8 +11,8 @@
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-4">
                 <div class="card shadow border-0 rounded">
-                    <div class="card-header text-center bg-primary text-white">
-                        <h3 class="mb-0">Gestão Jurídica</h3>
+                    <div class="card-header text-center text-white" style="background-color: #343a40">
+                        <h3 class="mb-0">Nome do Sistema</h3>
                         <small class="text-white-50">Acesse sua conta</small>
                     </div>
                     <div class="card-body">
@@ -73,20 +73,20 @@
                             
                             <!-- Botão de Login -->
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">Entrar</button>
+                                <button type="submit" class="btn" style="background-color: #343a40; color: #ffffff">Entrar</button>
                             </div>
                         </form>
                     </div>
                     
                     <!-- Link para recuperação de senha -->
                     <div class="card-footer text-center">
-                        <a href="{{ route('password.request') }}" class="text-decoration-none">Esqueceu sua senha?</a>
+                        <a href="{{ route('password.request') }}" class="text-decoration-none" style="color: #343a40">Esqueceu sua senha?</a>
                     </div>
                 </div>
                 
                 <!-- Rodapé -->
                 <footer class="text-center mt-4 text-muted">
-                    <small>© {{ date('Y') }} Gestão Jurídica. Todos os direitos reservados.</small>
+                    <small>© {{ date('Y') }} Nome do Sistema. Todos os direitos reservados.</small>
                 </footer>
             </div>
         </div>
