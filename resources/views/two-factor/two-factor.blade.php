@@ -11,7 +11,7 @@
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-4">
                 <div class="card shadow border-0 rounded">
-                    <div class="card-header text-center bg-primary text-white">
+                    <div class="card-header text-center text-white" style="background-color: #343a40">
                         <h3 class="mb-0">Verificação de 2 Fatores</h3>
                         <small>Insira o código enviado para seu {{ Auth::user()->two_factor_type === 'sms' ? 'telefone' : 'e-mail' }}.</small>
                     </div>
@@ -40,7 +40,7 @@
                                 @enderror
                             </div>
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">Verificar</button>
+                                <button type="submit" class="btn text-white" style="background-color: #343a40">Verificar</button>
                             </div>
                         </form>
                         <form action="{{ route('two-factor.resend') }}" method="POST" class="mt-3">
@@ -50,7 +50,7 @@
                     </div>
                 </div>
                 <footer class="text-center mt-4 text-muted">
-                    <small>© {{ date('Y') }} Gestão Jurídica. Todos os direitos reservados.</small>
+                    <small>© {{ date('Y') }} Nome do Sistema. Todos os direitos reservados.</small>
                 </footer>
             </div>
         </div>

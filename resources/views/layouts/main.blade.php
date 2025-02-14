@@ -28,9 +28,6 @@
     <!-- CSS personalizado view perfil-->
     <link rel="stylesheet" href="{{ asset('css/perfil/perfil-form.css') }}">
 
-    <!-- CSS personalizado view escritorio-->
-    <link rel="stylesheet" href="{{ asset('css/escritorio/escritorio-form.css') }}">
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
